@@ -1,0 +1,447 @@
+(function() {
+//load the script    
+
+    //<subusrcookiejs> - for token rewriter
+    
+    window.jQuery || document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"><\/script>');
+    
+     var ASSET_DIR = 'https://z8games.akamaized.net/portal_na/template_new/assets/';
+
+    var gnbContainer = "#sgw-top-navigation";
+    var lnbContainer = ".sgw-top-local-navigation";
+
+
+    // Poll for jQuery to come into existance
+    //can add the things you need and then poll for them to come into existence 
+    //-- e.g. jquery ui
+    var checkReady = function(callback) {
+        if (window.jQuery) {
+            callback(jQuery);
+        }
+        else {
+            window.setTimeout(function() { checkReady(callback); }, 100);
+        }
+    };
+
+    //called when jquery is confirmed to be loaded
+    checkReady(function() {
+    
+  
+      //https://www.phpied.com/when-is-a-stylesheet-really-loaded/
+      //
+      //wait till css has loaded and then create GNB, since 
+      //we don't want gnb to render before then and we also 
+      //need to use JS to get GNB style properties so that 
+      //it can render properly on page
+
+      // load stylesheet
+            var url = ASSET_DIR + 'css/gnb_global_050825.css';
+      
+      var head = document.getElementsByTagName('head')[0];
+      
+      //may not be needed
+      // var link = document.createElement('link');
+   
+      // link.type = "text/css";
+      // link.rel = "stylesheet"
+      // link.href = url;
+
+
+         var style = document.createElement('style');
+        style.textContent = '@import "' + url + '"';
+   
+        // var fi = setInterval(function() {
+        //   try {
+        //     style.sheet.cssRules; // <--- MAGIC: only populated when file is loaded
+
+        //     // adjustPageForGNB();//to adjust in case of ban message 
+            
+        //      //determine if page has been scrolled down - so that 
+        //       //gnb_notice can be closed 
+        //       //
+        //       //slgightly modified from:
+        //      ///https://stackoverflow.com/questions/4326845/how-can-i-determine-the-direction-of-a-jquery-scroll-event
+            
+
+        //       // var lastScrollTop = $(this).scrollTop();
+        //       // $(window).scroll(function(event){
+        //       //    var st = $(this).scrollTop();
+        //       //    if (st > lastScrollTop){
+        //       //        // downscroll code
+        //       //        closeGNBNotice();
+                    
+        //       //    } 
+        //       //    // else {
+        //       //    //    // upscroll code
+        //       //    // }
+        //       //    lastScrollTop = st;
+        //       // });
+
+
+
+        //       clearInterval(fi);
+        //   } catch (e){ console.log(e); }
+        // }, 10);  
+         
+        head.appendChild(style);
+
+        createGNB();
+
+     }); 
+
+
+
+    function createGNB() {
+        // Use $ here...
+        jQuery(document).ready(function($) {
+          
+
+          //           // jQuery('head').append('<link rel="stylesheet" href="' + ASSET_DIR + 'css/gnb_global_081618.css">');  
+          // {else}
+          // jQuery('head').append('<link rel="stylesheet" href="' + ASSET_DIR + 'css/gnb_global_081618__noresp.css">');  
+          // 
+          var gnbHTML =
+                        '<div id="sgw_gnb_div" style="display: none;">' +
+
+        '<nav id="sgw_gnavbar">' +
+          '<div id="sgw_gnavbar_in">' +
+          '' +
+            '<button type="button" id="gnb_z8_icon"></button>' +
+
+      '' +
+            '<div id="sgw_gnavmenu">' +
+              '<button id="gnm_mobile_close_btn" class=""></button>' +
+              '<a href="https://www.z8games.com" id="gnm_z8_logo">Z8Games</a>' +
+
+              '<div id="gnm_user_block" class="gnm_dropdown logout_ver">' +
+                '<a href="https://www.z8games.com/login.html?returnurl=' + encodeURIComponent(window.location.href) + '" id="gnm_user_login" class="gnm_link_ext">Log In</a>' +
+
+                '<a href="https://www.z8games.com/signup.html?gid=11" id="gnm_user_signin" class="gnm_link_ext clr_blue">Sign Up</a>' +
+              '</div>' +
+
+              '<div id="gnm_menu_game" class="gnm_dropdown">' +
+                '<button type="button" class="gnm_menu_button">Games<span class="btn-triangle-down"></span></button>' +
+                '<div class="gnm_dropdown_block gamelist">' +
+                  '<ul class="gnm_droplist gamelist">' +
+                    '<li class="gamelist_item">' +
+                      '<a href="https://crossfire.z8games.com/main.html" class="gamelist_a" target="_self">' +
+                        '<span class="CFNA gmenu-item-poster"></span>' +
+                        '<span class="CFNA gmenu-item-icon"></span>' +
+                        '<span class="CFNA gmenu-item-name">CrossFire</span>' +
+                      '</a>' +
+                    '</li>' +
+                                                           '</ul>' +
+                '</div>' +
+              '</div>' +
+
+      '' +
+              '<div id="gnm_menu_support" class="gnm_dropdown">' +
+                '<button type="button" class="gnm_menu_button">Support<span class="btn-triangle-down"></span></button>' +
+                '<div class="gnm_dropdown_block ">' +
+                  '<ul class="gnm_droplist">' +
+                    '<li class="gnm_dl_item"><a href="https://www.z8games.com/lost_id_password.html" class="gnm_dl_a"><span class="forgot menu-item-icon"></span>Forgot your Password?</a></li>' +
+                    '<li class="gnm_dl_item"><a href="https://www.z8games.com/deposit.html?location=WCF1" class="gnm_dl_a"><span class="buyzp menu-item-icon"></span>Purchase ZP</a></li>' +
+                    '<li class="gnm_dl_item"><a href="https://help.z8games.com/hc/en-us/requests/new" class="gnm_dl_a"><span class="support menu-item-icon"></span>Send Support Ticket</a></li>' +
+                    '<li class="gnm_dl_item"><a href="https://help.z8games.com" class="gnm_dl_a"><span class="faq menu-item-icon"></span>FAQ</a></li>' +
+                  '</ul>' +
+                '</div>' +
+              '</div>' +
+
+            '</div>' +
+          '</div>' +
+
+      '' +
+        '</nav>' +
+
+          '</div>';
+
+        
+
+     $(gnbContainer).append(gnbHTML);
+    // $('body').prepend(gnbHTML);
+
+         
+    //adjust page for gnb (in case of ban message)
+    //when gnbcontainer is visible, which 
+    //should happen when css loads
+    var fi = setInterval(function() {
+      if ($('#sgw_gnb_div').is(':visible')) {
+        adjustPageForGNB();
+        clearInterval(fi);
+      }
+    }, 10);
+
+
+
+    //commented out for now  it may nollonger be necesary 
+    ///////page adjustments to accomodate gnb START ////////
+    // adjustPageForGNB();
+    
+    //used to indicate if mobile adjustments have been applied 
+    //to determine if a adjustPageForGNB() function call is 
+    //necessary
+    // var mobileAdjustmentsClass = 'page-adjust-applied';
+    
+    // if(window.innerWidth <= 800)
+    //   $('#sgw_gnb_div').addClass(mobileAdjustmentsClass);
+    
+    // $(window).on('resize', function() {
+    //  if (
+    //     window.innerWidth <= 800 && 
+    //     !$('#sgw_gnb_div').hasClass(mobileAdjustmentsClass)
+    //   ) {
+    //       $('#sgw_gnb_div').addClass(mobileAdjustmentsClass);
+    //       adjustPageForGNB();
+    //   }
+    //   else if (
+    //     window.innerWidth > 800 && 
+    //     $('#sgw_gnb_div').hasClass(mobileAdjustmentsClass)
+    //   ) {
+    //     $('#sgw_gnb_div').removeClass(mobileAdjustmentsClass);
+    //     adjustPageForGNB();
+    //   }
+    // });
+
+    // //innefficient way - but works??  - it's a bit quirky too
+    // $(window).on('resize', function() {
+    //   adjustPageForGNB();
+    // })
+    
+    ///////page adjustments to accomodate gnb END ///////
+
+    var lightbox = document.getElementById('sgw_gnb_div');
+
+        var breakPoint = 600;
+     
+
+    var isMobile = false;
+    var isIE = detectIE();
+
+
+    //gnb page adjustments - to accomodate potential gnb 
+    //ban user message (it's height increases as its message
+    //text is wrapped)
+    // adjustPageForGNB();
+    
+
+
+
+    $(window).resize(function() {
+                if(window.innerWidth > breakPoint){
+          $("#sgw_gnavmenu").show();
+            $("#sgw_gnb_div").removeClass("lightboxmode");
+            $(".gnm_dropdown_block").hide();
+          $(".gnm_dropdown").removeClass('open');
+        }else{
+          $("#sgw_gnavmenu").hide();
+          $("#sgw_gnb_div").removeClass("lightboxmode");
+        }
+        
+        adjustPageForGNB();
+      });
+    
+
+
+
+    $(document.body).on('click', '#gnb_z8_icon' ,function(){
+          $("#sgw_gnavmenu").show();
+          $("#sgw_gnb_div").addClass("lightboxmode");
+      });
+    $(document.body).on('click', '#gnm_mobile_close_btn' ,function(){
+          $("#sgw_gnavmenu").hide();
+          $("#sgw_gnb_div").removeClass("lightboxmode");
+          $(".gnm_dropdown_block").hide();
+          $(".gnm_dropdown").removeClass('open');
+      });
+
+    
+
+    $(document.body).on('click', function(event){
+      if (event.target == lightbox ){
+
+        $("#sgw_gnavmenu").hide();
+        $("#sgw_gnb_div").removeClass("lightboxmode");
+        $(".gnm_dropdown_block").hide();
+            $(".gnm_dropdown").removeClass('open');
+      }
+    });
+
+
+    $(document.body).on('click', '.gnm_menu_button' ,function(){
+      if(window.innerWidth < breakPoint){
+        $(".gnm_dropdown").removeClass('open');
+            $(this).parent().addClass('open');
+            $(".gnm_dropdown_block").hide();
+            $(this).next().slideDown();
+        }
+      });
+
+
+   $(document.body).on('mouseenter', '.gnm_dropdown', function() {
+    if(window.innerWidth > breakPoint){
+      if(isIE){ 
+        $(".gnm_dropdown_block").hide();
+            $(this).children('.gnm_dropdown_block').show();
+      }else{
+        $(".gnm_dropdown_block").hide();
+            $(this).children('.gnm_dropdown_block').slideDown();
+      }       
+    }     
+  });
+
+    $(document.body).on('mouseleave', '.gnm_dropdown', function() {
+        if(window.innerWidth > breakPoint){
+            $(".gnm_dropdown_block").hide();
+      }
+    });
+   
+    
+    $(document.body).on('click', '#gnb_notice_close_btn' ,function(){
+          closeGNBNotice();
+          
+               });
+
+    
+
+     /////////my additions for system integration/////////
+     
+     //set appriate class to games list dpending on number of games
+     //that are featured
+     var numGames = $('#gnm_menu_game .gnm_dropdown_block.gamelist li').length;
+     $('#gnm_menu_game .gnm_dropdown_block.gamelist')
+      .addClass('g' + numGames);
+
+
+    $(document.body).on('mouseenter', '#gnm_menu_getzp', function() {
+      var ZPBalanceElement = $(this).find(".addzp.menu-item-balance"); 
+
+      if ($(ZPBalanceElement).hasClass('zp-requested')) 
+        return true;  //nothing to do because ajax for zp has been called
+
+      //otherwise, call ajax for zp amount
+      $(ZPBalanceElement).addClass('zp-requested');
+      $.ajax({
+        dataType: "jsonp",
+        url: "https://www.z8games.com/loging/restAPI/account.php?request=getzpbalance", 
+        success: function(result) {
+          ZPBalanceElement.html(formatWithCommas(result.ZPBalance) + " ZP");
+        }
+      });
+    });
+    
+
+    function closeGNBNotice() {
+    if ($('#sgw_gnb_noticediv:hidden').length === 1) 
+      return false;
+
+    $('#sgw_gnb_noticediv').hide();
+    adjustPageForGNB();   
+  }
+
+  
+  function adjustPageForGNB() {
+
+
+    var GNBHeight = $('#sgw_gnb_div').height();
+        // console.log(GNBHeight); //dbg
+
+			
+    
+    $(lnbContainer).css('top', GNBHeight);
+  }
+
+  }); //call to jQuery(document).ready() end              
+}   //end fucntion definition of createGNB()
+       
+  
+
+ 
+
+  //may not be needed - i will leave them below for now - and commen them ouot 
+    //later if necessary 
+
+    ////////////HELPER FUNCTIONS ///////////////////
+
+    // cookie handling functions
+    // http://stackoverflow.com/questions/4825683/how-do-i-create-and-read-a-value-from-cookie
+    // --------------------------------------------
+
+    function createCookie(name, value, days) {
+        var expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name + "=" + value + expires + ";domain=.z8games.com;path=/";
+    }
+
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) {
+                    c_end = document.cookie.length;
+                }
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+            else return undefined;
+        }
+        return undefined;
+    }
+
+    //functions to get query paramter  
+    //from: http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+  //http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+   function formatWithCommas(x) {
+              return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+
+
+        /**
+   * detect IE
+   * returns version of IE or false, if browser is not Internet Explorer
+   */
+  function detectIE() {
+      var ua = window.navigator.userAgent;
+
+      var msie = ua.indexOf('MSIE ');
+      if (msie > 0) {
+          // IE 10 or older => return version number
+          return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+      }
+
+      var trident = ua.indexOf('Trident/');
+      if (trident > 0) {
+          // IE 11 => return version number
+          var rv = ua.indexOf('rv:');
+          return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+      }
+
+      var edge = ua.indexOf('Edge/');
+      if (edge > 0) {
+         // Edge (IE 12+) => return version number
+         return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+      }
+
+      // other browser
+      return false;
+  }
+
+
+
+  
+ })();    //end of self-invoking function 

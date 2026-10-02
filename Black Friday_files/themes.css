@@ -1,0 +1,59 @@
+:root {
+  --color-cfshop: #ff3f13;
+  --color-middle: #808080;
+  --border-radius: 3px;
+  --transition-duration: 200ms;
+  --drop-shadow: 0px 5px 10px hsla(0, 0%, 0%, 0.1);
+  accent-color: var(--color-cfshop);
+  --color-blue: #007eff;
+  --color-red: #d90000;
+  --color-yellow: #e7c500;
+  --color-green: #67a437;
+  --color-block-dark: #1f2126;
+  --color-block-middle: #2a2c33;
+  --color-block-light: #343740;
+  --color-text: white;
+  color-scheme: dark;
+  background-color: var(--color-block-dark);
+}
+
+::backdrop {
+  background-color: hsla(0, 0%, 0%, 0.8);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-green: #a0ff54;
+    --color-block-dark: #e6e5e1;
+    --color-block-middle: #f2f2f2;
+    --color-block-light: #ffffff;
+    --color-text: black;
+    color-scheme: light;
+  }
+  ::backdrop {
+    background-color: hsla(0, 0%, 100%, 0.8);
+  }
+}
+html.darkmode {
+  --color-green: #67a437;
+  --color-block-dark: #1f2126;
+  --color-block-middle: #2a2c33;
+  --color-block-light: #343740;
+  --color-text: white;
+  color-scheme: dark;
+  *::backdrop {
+    background-color: hsla(0, 0%, 0%, 0.8);
+  }
+}
+
+html.lightmode {
+  --color-green: #a0ff54;
+  --color-block-dark: #e6e5e1;
+  --color-block-middle: #f2f2f2;
+  --color-block-light: #ffffff;
+  --color-text: black;
+  color-scheme: light;
+  *::backdrop {
+    background-color: hsla(0, 0%, 100%, 0.8);
+  }
+}

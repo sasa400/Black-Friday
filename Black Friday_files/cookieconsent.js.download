@@ -1,0 +1,361 @@
+/*
+    Overview: Consent mode parameters
+
+    Setting Name            Used by Google    Description
+    ad_storage              Yes               Enables storage (such as cookies) related to advertising
+    analytics_storage       Yes               Enables storage (such as cookies) related to analytics e.g. visit duration
+    ad_user_data            Yes               Whether Google's services can use user data for building advertising audiences
+    ad_personalization      Yes               Whether Google's services can use the data for remarketing
+    functionality_storage   No                Enables storage that supports the functionality of the website or app e.g. language settings
+    personalization_storage No                Enables storage related to personalization e.g. video recommendations
+    security_storage        No                Enables storage related to security such as authentication functionality, fraud prevention, and other user protection
+*/
+window.dataLayer = window.dataLayer || [];
+function gtag() { dataLayer.push(arguments); }
+
+//if (localStorage.getItem('consentMode') === null) {
+if (getCookie('consentMode') === null) { 
+  console.log("Consent Init");  
+  gtag('consent', 'default', {
+    'functionality_storage': 'denied',
+    'security_storage': 'denied',
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'denied',
+    'personalization_storage': 'denied',
+    'wait_for_update': 500,
+  });
+} else {
+  console.log("Consent loaded",JSON.parse(getCookie('consentMode'))); 
+  //gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+  gtag('consent', 'default', JSON.parse(getCookie('consentMode')));
+}
+
+//window.onload = function() {
+var cookie_consent_banner_dom = "";
+if(dnt())
+{
+  cookie_consent_banner_dom = `
+    <div class="cookie-consent-container">
+      <div id="cookie-consent-banner" class="cookie-consent-banner">
+        <div class="cookie-consent-body">
+          <h3>This website uses cookies</h3>
+          <p>We use cookies to personalize content and ads, to provide social media features and to analyze our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information that you've provided to them or that they've collected from your use of their services.</p>
+          <div class="cookie-consent-options">
+            <label><input id="consent-necessary" type="checkbox" value="Necessary" checked disabled><div>Necessary</div></label>
+            <label><input id="consent-analytics" type="checkbox" value="Analytics" disabled><div>Analytics</div></label>
+            <label><input id="consent-marketing" type="checkbox" value="Marketing" disabled><div>Marketing & Partner Cookies</div></label>
+            <label><input id="consent-preferences" type="checkbox" value="Preferences" checked><div>Preferences</div></label>
+          </div>
+          <div class="option_more_detail">Show details</div>
+          <div class="option_description"><h4>Analytics Cookies</h4><p>Analytics cookies are used to help collect data that allows us to understand how users interact with our service. These insights allow us to improve content and to build better features that improve your experience. You are free to refuse these types of cookies by clicking here.</p><h4>Marketing & Partner Cookies</h4><p>Marketing & Partner cookies may be set through our site by Z8Games, Smilegate West or our partners. They are used to build a profile of your interests and show you relevant advertisements for Z8Games. They do not directly store your personal information but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will still experience advertisements from Z8Games but they won’t be tailored to your interests. You are free to refuse these types of cookies by clicking here.</p><h4>Preferences Cookies</h4><p>Preference cookies enable our website to remember information that changes the way the website behaves or looks, like your language or region. You are free to refuse these types of cookies by clicking here.</p></div>
+        </div>
+        <div class="cookie-consent-buttons">
+          <button id="cookie-consent-btn-reject-all" class="cookie-consent-button btn-grayscale">Reject All</button>
+          <button id="cookie-consent-btn-accept-some" class="cookie-consent-button btn-outline">Accept Selection</button>
+          <button id="cookie-consent-btn-accept-all" class="cookie-consent-button btn-success">Accept All</button>
+        </div>
+        </div>
+    </div>
+  `
+}
+else
+{
+  cookie_consent_banner_dom = `
+    <div class="cookie-consent-container">
+      <div id="cookie-consent-banner" class="cookie-consent-banner">
+        <div class="cookie-consent-body">
+          <h3>This website uses cookies</h3>
+          <p>We use cookies to personalize content and ads, to provide social media features and to analyze our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information that you've provided to them or that they've collected from your use of their services.</p>
+          <div class="cookie-consent-options">
+            <label><input id="consent-necessary" type="checkbox" value="Necessary" checked disabled><div>Necessary</div></label>
+            <label><input id="consent-analytics" type="checkbox" value="Analytics" checked><div>Analytics</div></label>
+            <label><input id="consent-marketing" type="checkbox" value="Marketing" checked><div>Marketing & Partner Cookies</div></label>
+            <label><input id="consent-preferences" type="checkbox" value="Preferences" checked><div>Preferences</div></label>
+          </div>
+          <div class="option_more_detail">Show details</div>
+          <div class="option_description"><h4>Analytics Cookies</h4><p>Analytics cookies are used to help collect data that allows us to understand how users interact with our service. These insights allow us to improve content and to build better features that improve your experience. You are free to refuse these types of cookies by clicking here.</p><h4>Marketing & Partner Cookies</h4><p>Marketing & Partner cookies may be set through our site by Z8Games, Smilegate West or our partners. They are used to build a profile of your interests and show you relevant advertisements for Z8Games. They do not directly store your personal information but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will still experience advertisements from Z8Games but they won’t be tailored to your interests. You are free to refuse these types of cookies by clicking here.</p><h4>Preferences Cookies</h4><p>Preference cookies enable our website to remember information that changes the way the website behaves or looks, like your language or region. You are free to refuse these types of cookies by clicking here.</p></div>
+        </div>
+        <div class="cookie-consent-buttons">
+          <button id="cookie-consent-btn-reject-all" class="cookie-consent-button btn-grayscale">Reject All</button>
+          <button id="cookie-consent-btn-accept-some" class="cookie-consent-button btn-outline">Accept Selection</button>
+          <button id="cookie-consent-btn-accept-all" class="cookie-consent-button btn-success">Accept All</button>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+
+  document.body.insertAdjacentHTML('beforeend', cookie_consent_banner_dom)
+  const cookie_consent_banner = document.body.lastElementChild
+
+  function dnt () {
+    return (navigator.doNotTrack == "1" || window.doNotTrack == "1")
+  }
+
+  function gpc () {
+    return (navigator.globalPrivacyControl || window.globalPrivacyControl)
+  }
+
+  function showBanner() {
+    //const cm = JSON.parse(window.localStorage.getItem('consentMode'));
+    const cm = JSON.parse(getCookie('consentMode'));
+    
+    if (cm && cm.functionality_storage) {
+      if (cm.functionality_storage == 'granted') {
+        document.querySelector('#consent-necessary').checked = true
+        document.querySelector('#consent-necessary').disabled = true
+      } else {
+        document.querySelector('#consent-necessary').checked = false
+        document.querySelector('#consent-necessary').disabled = false
+      }
+      document.querySelector('#consent-analytics').checked = (cm.analytics_storage == 'granted') ? true : false
+      document.querySelector('#consent-preferences').checked = (cm.personalization_storage == 'granted') ? true : false
+      document.querySelector('#consent-marketing').checked = (cm.ad_storage == 'granted') ? true : false
+      //document.querySelector('#consent-partners').checked = (cm.ad_personalization == 'granted') ? true : false
+      //document.querySelector('#consent-third').checked = (cm.ad_third == 'granted') ? true : false
+    }
+    cookie_consent_banner.style.display = 'flex';
+  }
+
+  function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; domain=.z8games.com; path=/";
+  }
+
+  function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0;i < ca.length;i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+      }
+      return null;
+  }
+
+  function clearCookie()
+  {
+    //const cm = JSON.parse(window.localStorage.getItem('consentMode'))
+    const cm = JSON.parse(getCookie('consentMode'))
+    if (cm && cm.functionality_storage) {
+      if(cm.ad_storage == 'denied') // marketing
+      {
+        //alert("remove ad cookie");
+        delete_cookie('fromads','/','.z8games.com');
+        delete_cookie('_fbp','/','.z8games.com');
+      }
+
+
+      if(cm.personalization_storage == 'denied')
+      {
+        delete_cookie('sgwestnalogusr','/','.z8games.com');
+      }
+
+      if(cm.analytics_storage == 'denied')
+      {
+        deleteGoogleAnalyticsCookies();
+      }
+    }
+  }
+  function deleteGoogleAnalyticsCookies() {
+    // List of known Google Analytics cookie names
+    const gaCookieNames = [
+      '_ga',
+      '_gid',
+      '_gat',
+      '_gcl_au'
+    ];
+
+    // Dynamically detect GA4 cookie (_ga_<container-id>) and add it to the list
+    // & Dynamically detect _dc_gtm cookie (_dc_gtm_<container-id>) and add it to the list
+    document.cookie.split(';').forEach(cookie => {
+      const name = cookie.trim().split('=')[0];
+      if (name.startsWith('_ga') && !gaCookieNames.includes(name)) {
+        gaCookieNames.push(name);
+      }
+
+      if (name.startsWith('_dc_gtm') && !gaCookieNames.includes(name)) {
+        gaCookieNames.push(name);
+      }
+    });
+
+    const domain = location.hostname;
+
+    // Attempt to delete each GA cookie with different domain/path combinations
+    gaCookieNames.forEach(name => {
+
+      delete_cookie(name, "/", ".z8games.com");
+      
+      // Additional Cleaning
+      // Basic path
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+
+      // With current domain
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+
+      // With dot-prefixed domain to cover subdomains
+      if (!domain.startsWith('.')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`;
+      }
+    });
+
+    console.log('Google Analytics cookies deleted');
+  }
+
+  function deleteAkamaiCookies(debug = false) {
+    // List of common Akamai cookie names
+    const akamaiCookieNames = [
+      'aka_debug',
+      'akamai_analytics',
+      '_abck',
+      'bm_sz',
+      'ak_bmsc',
+      'RT',
+      'bm_mi',
+      'bm_sv'
+    ];
+
+    const domain = location.hostname;
+
+    // Attempt to delete each Akamai cookie with different domain/path combinations
+    akamaiCookieNames.forEach(name => {
+
+      delete_cookie(name, "/", ".z8games.com");
+      // Basic path
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      // With current domain
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+      // With dot-prefixed domain to cover subdomains
+      if (!domain.startsWith('.')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`;
+      }
+
+      // Log each deleted cookie name if debug is true
+      if (debug) {
+        console.log(`Deleted Akamai cookie: ${name}`);
+      }
+    });
+
+    if (debug) {
+      console.log('Akamai cookies deletion complete.');
+    }
+  }
+
+  function delete_cookie( name, path, domain ) {
+    if( get_cookie( name ) ) {
+      document.cookie = name + "=" +
+        ((path) ? ";path="+path:"")+
+        ((domain)?";domain="+domain:"") +
+        ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    }
+  }
+
+  function get_cookie(name){
+    return document.cookie.split(';').some(c => {
+        return c.trim().startsWith(name + '=');
+    });
+  }
+
+  function hideBanner() {
+    cookie_consent_banner.style.display = 'none';
+  }
+
+  window.cookieconsent = {
+    show: showBanner,
+    hide: hideBanner
+  }
+
+  function setConsent(consent) {
+    const consentMode = {
+      'ad_storage': (consent.marketing && !dnt()) ? 'granted' : 'denied',
+      'analytics_storage': (consent.analytics && !dnt()) ? 'granted' : 'denied',
+      'ad_user_data': (consent.marketing && !dnt()) ? 'granted' : 'denied',
+      'ad_personalization': (consent.marketing && !dnt()) ? 'granted' : 'denied', //from marketing & partners
+      //'ad_personalization': (consent.partners && !gpc()) ? 'granted' : 'denied',
+      'functionality_storage': consent.necessary ? 'granted' : 'denied',
+      'personalization_storage': consent.preferences ? 'granted' : 'denied',
+      'security_storage': consent.necessary ? 'granted' : 'denied',
+      //'ad_third': consent.third ? 'granted' : 'denied',
+    };
+    window.cookieconsent.consentMode = consentMode
+    gtag('consent', 'update', consentMode);
+    //localStorage.setItem('consentMode', JSON.stringify(consentMode));
+    setCookie('consentMode',JSON.stringify(consentMode),365);
+    if(document.getElementById('cookiepolicy-necessary') !== null) {
+      updateConsent();
+    }
+  }
+
+  if (cookie_consent_banner) {
+    Array.from(document.querySelectorAll('.cookie-consent-banner-open')).map(btn => {
+      btn.addEventListener('click', () => {
+        showBanner()
+      })
+    })
+
+    //if (window.localStorage.getItem('consentMode')) {
+    if (getCookie('consentMode')) {
+      hideBanner()
+    } else {
+      showBanner()
+    }
+
+    //clear cookie
+    clearCookie();
+
+    cookie_consent_banner.querySelector('#cookie-consent-btn-accept-all').addEventListener('click', () => {
+      setConsent({
+        necessary: true,
+        analytics: true,
+        preferences: true,
+        marketing: true
+        //partners: true,
+        //third: true
+      });
+      hideBanner();
+      clearCookie();
+    });
+    cookie_consent_banner.querySelector('#cookie-consent-btn-accept-some').addEventListener('click', () => {
+      setConsent({
+        necessary: true,
+        analytics: document.querySelector('#consent-analytics').checked,
+        preferences: document.querySelector('#consent-preferences').checked,
+        marketing: document.querySelector('#consent-marketing').checked
+        //partners: document.querySelector('#consent-partners').checked
+        //third: document.querySelector('#consent-third').checked
+      });
+      hideBanner();
+      clearCookie();
+    });
+    cookie_consent_banner.querySelector('#cookie-consent-btn-reject-all').addEventListener('click', () => {
+      setConsent({
+        necessary: true,
+        analytics: false,
+        preferences: false,
+        marketing: false
+        //partners: false,
+        //third: false
+      });
+      hideBanner();
+      clearCookie();
+    });
+  }
+  document.getElementsByClassName("option_more_detail")[0].addEventListener("click", function() {
+      var content = document.getElementsByClassName("option_description")[0];
+      if (content.style.display === "none" || content.style.display === "") {
+          content.style.display = "block";
+          this.textContent = "Hide details";
+      } else {
+          content.style.display = "none";
+          this.textContent = "Show details";
+      }
+  });
+//}

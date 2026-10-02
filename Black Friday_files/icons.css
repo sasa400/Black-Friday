@@ -1,0 +1,172 @@
+@font-face {
+  font-family: "cf-shop";
+  src: url("https://z8games.akamaized.net/common/assets/lib/cfshop/fonts/cf-shop.eot");
+  src: url("https://z8games.akamaized.net/common/assets/lib/cfshop/fonts/cf-shop.eot?#iefix") format("embedded-opentype"), url("https://z8games.akamaized.net/common/assets/lib/cfshop/fonts/cf-shop.woff") format("woff"), url("https://z8games.akamaized.net/common/assets/lib/cfshop/fonts/cf-shop.ttf") format("truetype"), url("https://z8games.akamaized.net/common/assets/lib/cfshop/fonts/cf-shop.svg#cf-shop") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+[data-icon]:before {
+  font-family: "cf-shop" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^=cfshop-]:before,
+[class*=" cfshop-"]:before {
+  font-family: "cf-shop" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.cfshop-icon-wallet:before {
+  content: "a";
+}
+
+.cfshop-icon-zp:before {
+  content: "b";
+}
+
+.cfshop-icon-ep:before {
+  content: "c";
+}
+
+.cfshop-icon-vvip:before {
+  content: "d";
+}
+
+.cfshop-icon-zp-pass:before {
+  content: "e";
+}
+
+.cfshop-icon-gp-pass:before {
+  content: "f";
+}
+
+.cfshop-icon-hotitem:before {
+  content: "g";
+}
+
+.cfshop-icon-vipitem:before {
+  content: "h";
+}
+
+.cfshop-icon-newitem:before {
+  content: "i";
+}
+
+.cfshop-icon-filter:before {
+  content: "j";
+}
+
+.cfshop-icon-hamburger:before {
+  content: "k";
+}
+
+.cfshop-icon-dark-mode:before {
+  content: "l";
+}
+
+.cfshop-icon-light-mode:before {
+  content: "m";
+}
+
+.cfshop-icon-home:before {
+  content: "n";
+}
+
+.cfshop-icon-checked:before {
+  content: "o";
+}
+
+.cfshop-icon-delete:before {
+  content: "p";
+}
+
+.cfshop-icon-collection:before {
+  content: "q";
+}
+
+.cfshop-icon-inventory:before {
+  content: "r";
+}
+
+.cfshop-icon-reward:before {
+  content: "s";
+}
+
+.cfshop-icon-cart:before {
+  content: "t";
+}
+
+.cfshop-icon-recharge:before {
+  content: "u";
+}
+
+.cfshop-icon-receipt:before {
+  content: "v";
+}
+
+.cfshop-icon-dropdown:before {
+  content: "w";
+}
+
+.cfshop-icon-close:before {
+  content: "x";
+}
+
+.cfshop-icon-search:before {
+  content: "y";
+}
+
+.cfshop-icon-share:before {
+  content: "z";
+}
+
+.cfshop-icon-left-small:before {
+  content: "A";
+}
+
+.cfshop-icon-right-small:before {
+  content: "B";
+}
+
+.cfshop-icon-right-big:before {
+  content: "C";
+}
+
+.cfshop-icon-left-big:before {
+  content: "D";
+}
+
+.cfshop-icon-info:before {
+  content: "E";
+}
+
+.cfshop-star:before {
+  content: "F";
+}
+
+.cfshop-star-half:before {
+  content: "G";
+}
+
+.cfshop-star-half-o:before {
+  content: "H";
+}
+
+.cfshop-star-o:before {
+  content: "I";
+}

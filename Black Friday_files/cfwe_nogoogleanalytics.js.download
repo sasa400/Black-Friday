@@ -1,0 +1,362 @@
+var link = document.createElement('link');
+
+// Set the attributes for the link element
+link.rel = 'stylesheet';
+link.type = 'text/css';
+link.href = 'https://z8games.akamaized.net/cfna/consentmode/css/cookieconsent.css';
+
+// Append the link element to the head of the document
+document.head.appendChild(link);
+
+var script = document.createElement('script');
+
+// Set the type and source for the script element
+script.type = 'text/javascript';
+script.src = 'https://z8games.akamaized.net/cfna/consentmode/js/cookieconsent.js';
+
+// Append the script element to the body or head of the document
+document.body.appendChild(script); // or document.head.appendChild(script);
+
+//ZGAM CF1 Footer v2.2 2020-07-24
+(function() {
+  //requires jquery, so ensure jquery is loaded before we continue
+  window.jQuery ||
+    document.write(
+      '<script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>'
+    );
+
+  // Poll for jQuery to come into existance
+  var checkReady = function(callback) {
+    if (window.jQuery) {
+      callback(jQuery);
+    } else {
+      window.setTimeout(function() {
+        checkReady(callback);
+      }, 100);
+    }
+  };
+
+  //callback argument called when jquery is confirmed to be loaded
+  checkReady(function() {
+
+/* /////////////////////////////
+         START OF FOOTER
+//////////////////////////////*/
+
+/* /////////////////////////////
+          ARRAY SECTION
+//////////////////////////////*/
+var localCIBI = [{
+  'title' : 'Crossfire',
+  'urlBlack' : 'https://z8games.akamaized.net/common/footer/images/cf-mark-black.svg',
+  'urlWhite' : 'https://z8games.akamaized.net/common/footer/images/cf-mark-white.svg'
+},
+{
+  'title' : 'Z8 Games',
+  'urlBlack' : 'https://z8games.akamaized.net/common/assets/lib/logo/z8g-black-h.svg',
+  'urlWhite' : 'https://z8games.akamaized.net/common/assets/lib/logo/z8g-white-h.svg'
+},
+{
+  'title' : 'Smilegate West',
+  'urlBlack' : 'https://z8games.akamaized.net/common/assets/lib/logo/sgw-black-h.svg',
+  'urlWhite' : 'https://z8games.akamaized.net/common/assets/lib/logo/sgw-white-h.svg'
+},
+{
+  'title' : 'Smilegate Entertainment',
+  'urlBlack' : 'https://z8games.akamaized.net/common/assets/lib/logo/sge-black-h.svg',
+  'urlWhite' : 'https://z8games.akamaized.net/common/assets/lib/logo/sge-white-h.svg'
+}];
+
+var partnerCIBI; //Always define this variable
+/*partnerCIBI = [{
+  'title' : 'Razer Gold',
+  'urlBlack' : 'https://z8games.akamaized.net/common/footer/images/coin_rzr_gold_black.png',
+  'urlWhite' : 'https://z8games.akamaized.net/common/footer/images/coin_rzr_gold_white.png',
+}];*/
+
+var copyrightText = [
+  //'Smilegate West. &',
+  'Smilegate West, Inc. All rights reserved.',
+  //'Smilegate Entertainment. All rights reserved.'
+  'Smilegate Entertainment. All rights reserved.'
+];
+var copyrightTrade = 'Trademarks referenced herein belong to their respective owners.';
+var copyrightDate = "2025";
+
+var footerLinks = [{
+  'label' : 'Privacy Policy',
+  'url' : 'https://www.z8games.com/privacypolicy.html'
+},
+{
+  'label' : 'Terms and Conditions',
+  'url' : 'https://www.z8games.com/termsandcondition.html'
+},
+{
+  'label' : 'Imprint',
+  'url' : 'https://www.z8games.com/imprint.html'
+},
+{
+  'label' : 'Cookie Policy',
+  'url' : 'https://www.z8games.com/cookiepolicy.html'
+}];
+
+var socialLinks = [{
+  'service' : 'facebook',
+  'url' : 'https://www.facebook.com/crossfireonline'
+},
+{
+  'service' : 'twitter',
+  'url' : 'https://twitter.com/CrossFireOnline'
+},
+{
+  'service' : 'youtube',
+  'url' : 'https://gaming.youtube.com/c/CrossFireWest'
+},
+{
+  'service': 'twitch',
+  'url' : 'http://www.twitch.tv/cfonline/'
+},
+{
+  'service' : 'instagram',
+  'url' : 'https://www.instagram.com/crossfirewest/'
+},
+{
+  'service' : 'discord',
+  'url' : 'https://discord.gg/crossfire'
+}];
+var socialLinksImage = {
+  'urlBlack' : 'https://z8games.akamaized.net/common/assets/lib/sns/sns-sprite-black.png',
+  'urlWhite' : 'https://z8games.akamaized.net/common/assets/lib/sns/sns-sprite-white.png'
+};
+
+
+/* /////////////////////////////
+       GENERATOR SECTION
+//////////////////////////////*/
+$(document).ready(function() {
+  drawSocial();
+  drawFooter();
+  styleFooter();
+  footerThemeInit();
+});
+
+function drawSocial() {
+  var socialLinksDOM = "";
+  if (Array.isArray(socialLinks) && socialLinks.length >= 1) {
+    socialLinksDOM += '<section class="footer__sns">';
+    socialLinks.forEach(function(socialLinksi){
+      socialLinksDOM += '<a = href="'+ socialLinksi.url +'" title="'+ socialLinksi.url +'" target="_blank">';
+      socialLinksDOM += '<div class="footer__sociallink" id="sns-'+ socialLinksi.service + '" style="background-image:url(\'';
+      if ( $('.wrapper__footer').data('themedark') != null ){
+        socialLinksDOM += socialLinksImage.urlWhite;
+      } else {
+        socialLinksDOM += socialLinksImage.urlBlack;
+      }
+      socialLinksDOM += '\')"></div></a>';
+    });
+    socialLinksDOM += '</section>';
+  }
+  if ( $('.wrapper__footer').data('sns') != null ){
+    $('.wrapper__footer').append(socialLinksDOM);
+  }
+}
+
+function drawFooter() {
+  var localCIBIDOM = "";
+  var partnerCIBIDOM = "";
+  var copyrightTextDOM = "";
+  var footerLinksDOM = "";
+
+  if ( $('.wrapper__footer').data('gamelogo') == null ){
+    var localCIBIshift = localCIBI.shift();
+    drawLocalCIBI()
+  } else {
+    localCIBIshift = localCIBI;
+    drawLocalCIBI()
+  }
+  function drawLocalCIBI() {
+    localCIBI.forEach(function(localCIBIi){
+      localCIBIDOM += '<img src="';
+        if ( $('.wrapper__footer').data('themedark') != null ){
+          localCIBIDOM += localCIBIi.urlWhite;
+        } else {
+          localCIBIDOM += localCIBIi.urlBlack;
+        }
+      localCIBIDOM +='" height="60" title="' + localCIBIi.title + '"/>';
+    });
+  }
+
+  if ( Array.isArray(partnerCIBI) && partnerCIBI.length >= 1 ){
+    partnerCIBI.forEach(function(partnerCIBIi){
+      partnerCIBIDOM += '<img src="';
+        if ( $('.wrapper__footer').data('themedark') != null ){
+          partnerCIBIDOM += partnerCIBIi.urlWhite;
+        } else {
+          partnerCIBIDOM += partnerCIBIi.urlBlack;
+        }
+      partnerCIBIDOM += '" height="60" title="' + partnerCIBIi.title + '"/>';
+    });
+  }
+
+  copyrightText.forEach(function(copyrightTexti){
+    copyrightTextDOM += '&copy; ' + copyrightTexti + '&nbsp;';
+  });
+  copyrightTextDOM += copyrightTrade;
+  footerLinks.forEach(function(footerLinksi){
+    footerLinksDOM += '<li><a href="' + footerLinksi.url + '" target="_blank">' + footerLinksi.label + '</a></li>';
+  });
+
+  var footerModules = '<section class="footer__cibi">';
+    footerModules += '<article class="footer__cibi-local">' + localCIBIDOM + '</article>';
+      if (Array.isArray(partnerCIBI) && partnerCIBI.length >= 1){
+        footerModules += '<article class="footer__cibi-partner">' + partnerCIBIDOM + '</article>';
+      }
+    footerModules += '</section><section class="footer__copyrights"><p>' + copyrightTextDOM + '</p><ul>' + footerLinksDOM + '</ul></section>';
+  $('.wrapper__footer').append(footerModules);
+  $('.copyright-year').append(copyrightDate);
+}
+
+/* /////////////////////////////
+        STYLING SECTION
+//////////////////////////////*/
+function styleFooter() {
+  if (Array.isArray(partnerCIBI) && partnerCIBI.length >= 1) {
+    $('.footer__cibi').css( "justify-content", "space-between" );
+    $('.footer__copyrights').css( "align-items", "stretch" );
+    $('.footer__copyrights').css( "justify-content", "flex-start");
+  }
+  else {
+    $('.footer__cibi-local').css({"justify-content": "center", "text-align": "center"});
+    $('.footer__copyrights').css({"align-content": "center", "text-align": "center"});
+    $('.footer__copyrights > ul').css( "justify-content", "center");
+  }
+  if($('.wrapper__footer').data('themecustom') != null ) {
+    var bgColor = $('.wrapper__footer').data('bgcolor');
+    var copyColor = $('.wrapper__footer').data('copycolor');
+    var linkColor = $('.wrapper__footer').data('linkcolor');
+    $('.wrapper__footer').css( "background-color", bgColor );
+    $('.footer__copyrights p').css( "color", copyColor );
+    $('.footer__copyrights a').css( "color", linkColor );
+  }
+  else {
+    if($('.wrapper__footer').data('themedark') != null ) {
+      $('.wrapper__footer').css( "background-color", "#222222" );
+      $('.footer__copyrights a').css( "color", "#FFFFFF");
+      $('.footer__sns').css( "border-color", "#444444");
+    }
+    else {
+      $('.wrapper__footer').css( "background-color", "#EFEFEF" );
+      $('.footer__copyrights a').css( "color", "#000000");
+      $('.footer__sns').css( "border-color", "#DDDDDD");
+    }
+  }
+  $('.footer__copyrights li:first-child a').css( "color", '#f37820' );
+}
+
+
+//Initialize Color Mode for Footer Logos
+function footerThemeInit() {
+  if ($("html").attr("data-theme") == "light") {
+    footerLogos('black');
+  } else if ($("html").attr("data-theme") == "dark") {
+    footerLogos('white');
+  }
+}
+
+/* /////////////////////////////
+       END OF FOOTER
+//////////////////////////////*/
+
+  }); //checkready()
+})(); //iffe closure
+
+//Functions in this section are for controlling the dark mode toggle option.
+// Dark Mode Controller.
+/*
+function darkModeOn() {
+  if ($("html").attr("data-theme") == "dark") {
+    $("html").attr("data-theme","light");
+    footerLogos('black');
+  } else {
+    $("html").attr("data-theme","dark");
+    footerLogos('white');
+  }
+} 
+*/
+//Functions in this section are for controlling the dark mode toggle option.
+// modified to use local storage for mode persistence
+// Dark Mode Controller.
+function darkModeOn(initialMode) {
+
+  initialMode = (typeof initialMode !== 'undefined' && ('dark' === initialMode || 'light' === initialMode)) ? initialMode : null;
+  
+  switch (initialMode)
+  {
+    case 'dark':{
+      makeDarkMode();
+    }break;
+    case 'light':{
+      makeLightMode();
+    }break;
+    
+    default:{
+
+      var mode = window.localStorage.getItem('sgw_darkmode');
+      if(null !== mode)
+      { 
+        // a mode has been set - use it
+        // but it is basically the opposite of what is actually set
+
+        switch(mode)
+        {
+          case 'dark':{
+            makeLightMode();
+          }break;
+          case 'light':{
+            makeDarkMode();
+          }break;
+        }
+      }else{
+        // no mode has been set
+        // so toggle between states
+      
+          if ($("html").attr("data-theme") == "dark") {
+          makeLightMode();  
+          } else {
+          makeDarkMode();
+          }
+      }
+    }break;
+  }
+  
+  function makeDarkMode(){
+    window.localStorage.setItem('sgw_darkmode', "dark");
+    $("html").attr("data-theme","dark");
+    footerLogos('white');
+  }   
+
+  function makeLightMode(){
+    window.localStorage.setItem('sgw_darkmode', "light");
+    $("html").attr("data-theme","light");
+    footerLogos('black'); 
+  }   
+}
+
+function footerLogos(newColor) {
+  let oldColor;
+  if(newColor == 'white') {
+    oldColor = "black";
+  } else if(newColor == 'black') {
+    oldColor = "white";
+  }
+  // Swap CIBI logos
+  $(".footer__cibi-local").find("img").each(function(){
+    let cibiUrlSrc = $(this).attr('src');
+    cibiUrlSrc = cibiUrlSrc.replace(oldColor, newColor);
+    $(this).attr("src", cibiUrlSrc);
+  });
+  // Swap SNS logos
+  let snsUrlSrc = $(".footer__sociallink").attr('style');
+  snsUrlSrc = snsUrlSrc.replace(oldColor, newColor);
+  $(".footer__sociallink").attr('style', snsUrlSrc);
+}

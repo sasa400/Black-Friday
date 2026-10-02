@@ -1,0 +1,1194 @@
+//import startModals from './modules/modals.js';
+//import startModalsVideo from './modules/modals-video.js';
+//import startCarousels from './modules/carousels.js';
+
+//import initializeAccordions from './modules/accordions.js';
+//import initializeClock from './modules/countdown.js';
+//import initializeScrollFX from './modules/scrollfx.js';
+//import initializeTabs from './modules/tabs.js';
+//import initializeToolTips from './modules/tooltips.js';
+//import initializeHamburger from './modules/hamburger.js';
+// import initializePopOvers from './modules/popovers.js';
+
+
+// Globals
+
+// delegates addEventListener for dynamic contents
+function delegateEvent(type,selectorType,selector,callback) {
+  document.addEventListener(type, e => {
+    if ( selectorType == 'class' ) {
+      if (e.target.classList.contains(selector)) callback(e)
+    }
+
+    else if ( selectorType == 'id' ) {
+      if (e.target.id == selector) callback(e)
+      console.log(e.target.id)
+      console.log(selector)
+    }
+
+    else if ( selectorType == 'element' ) {
+      if (e.target.matches(selector)) callback(e)
+    }
+
+    else if ( selectorType == 'attribute' ) {
+      if (e.target.hasAttribute(selector)) callback(e)
+    }
+
+  })
+}
+
+// close() currently open dialog modal before opening the next dialog modal
+function closeOpenDialog() {
+  const allDialogs = document.querySelectorAll('dialog');
+  allDialogs.forEach( (dialog) => {
+    if (dialog.hasAttribute('open')) {
+      dialog.close();
+      dialog.querySelector('.modal').classList.remove('top','right','bottom','left');
+    }
+  });
+  closeHandler();
+}
+
+// isMobile
+function checkMobileDevice() {
+  let isMobile = false
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) isMobile = true
+  return isMobile
+}
+
+
+// Anchor Positioning
+function anchorPositioning(event,triggerEle,targetEle) {
+  let windowWidth,
+      windowHeight,
+      windowWHalf,
+      windowHHalf
+  const getWindow = () => {
+    windowWidth = window.innerWidth
+    windowHeight = window.innerHeight
+    windowWHalf = windowWidth / 2
+    windowHHalf = windowHeight / 2
+  }
+  getWindow()
+  window.onresize = () => {
+    getWindow()
+    modelessClose()
+  }
+
+  const triggerRect = triggerEle.getBoundingClientRect()
+  const targetRect = targetEle.getBoundingClientRect()
+  let x, y, animationDir
+  let mouseYrelpos = event.pageY - window.scrollY
+
+  x = ( triggerRect.left > windowWHalf ) ? triggerRect.width - targetRect.width : 0
+  y = ( mouseYrelpos > windowHHalf ) ? targetRect.height * -1 - 6 : triggerRect.height + 6
+  animationDir = ( mouseYrelpos > windowHHalf ) ? 'top' : 'bottom'
+
+  targetEle.style.left = `${x / 16}rem`
+  targetEle.style.top = `${y / 16}rem`
+  targetEle.classList.add(animationDir)
+}
+
+
+// Modals
+
+const startModals = () => {
+  delegateEvent("click", "attribute", "data-modal", e => {
+    loadModal(e.target.dataset.modal,e.target.dataset.animation)
+  });
+
+  const allDialog = document.querySelectorAll('dialog')
+  allDialog.forEach((dialog) => {
+    dialog.setAttribute('aria-modal',true)
+    //clickOutside(dialog)
+  })
+
+  document.addEventListener('keydown',(e) => {
+    if (e.isComposing || e.key === "Escape") {
+      const allDialog = Array.from(document.querySelectorAll('dialog'));
+      allDialog.forEach(dialog => {
+        if (dialog.getAttribute('open') == null) return;
+        closeModal(dialog);
+      })
+    }
+  })
+
+
+}
+
+function clickOutside(dialog) {
+  document.addEventListener('click', (event) => {
+    if (event.target == dialog) closeModal(dialog);
+  })
+}
+
+function loadModal(id,a) {
+  closeOpenDialog();
+
+  const targetID = document.querySelector(id);
+  targetID.showModal();
+  openHandler();
+    try{
+      const modalContainer = targetID.querySelector('.modal');
+      modalContainer.classList.add(a);
+      // addCloseButton(targetID);
+    }catch(e){
+      console.log(e);
+    }
+
+  const modalContainer = targetID.querySelector('.modal');
+  modalContainer.classList.add(a);
+  // addCloseButton(targetID);
+
+  let explicitCloseButton = targetID.querySelector('.close_button')
+  if (explicitCloseButton != null) explicitCloseButton.onclick = () => { closeModal(targetID) };
+
+  let thisGlider = targetID.querySelector('.glider')
+  if (thisGlider != null) startGlider(thisGlider)
+
+  targetID.onclick = (e) => {
+    if (e.target.tagName !== 'DIALOG') return; //This prevents issues with forms
+    closeModal(e.target);
+  };
+}
+
+function startGlider(target) {
+  if (target.classList.contains('initialized')) return
+
+  let btnPrev = target.closest('.modal').querySelector('.glider-prev')
+  let btnNext = target.closest('.modal').querySelector('.glider-next')
+  let slides = [].slice.call(target.children)
+  let index = 0
+
+  slides.forEach((slide) => {
+    slide.setAttribute('data-state','hidden')
+  })
+  slides[0].setAttribute('data-state','visible')
+
+  let slideDots = document.createElement('ul')
+  slideDots.classList.add('glider-dots')
+
+  for (let i = 0; i < slides.length; i++) {
+    let slideDot = document.createElement('li')
+    let slideButton = document.createElement('button')
+    slideButton.dataset.slideNumber = i
+    slideButton.innerHTML = '&#9675;'
+    if (i == 0) slideButton.innerHTML = '&#9679;'
+
+    slideButton.addEventListener('click', (e) => {
+      index = parseInt(slideButton.dataset.slideNumber)
+      setSlide()
+      setDot()
+    })
+
+    slideDot.appendChild(slideButton)
+    slideDots.appendChild(slideDot)
+  }
+
+  target.parentElement.appendChild(slideDots)
+  target.classList.add('initialized')
+
+  if(!btnPrev) return
+  btnPrev.addEventListener('click', (e) => {
+    if(index == 0) index = slides.length
+    index = index - 1
+    setSlide()
+    setDot()
+  })
+
+  btnNext.addEventListener('click', (e) => {
+    if(index == (slides.length-1)) index = -1
+    index = index + 1
+    setSlide()
+    setDot()
+  })
+
+  function setSlide() {
+    slides.forEach((slide) => slide.setAttribute('data-state','hidden'))
+    slides[index].setAttribute('data-state','visible')
+  }
+
+  function setDot() {
+    Array.from(slideDots.children).forEach((dot, i) => {
+      let button = dot.querySelector("button");
+      if (button) button.innerHTML = '&#9675;'
+      if (index == i) button.innerHTML = '&#9679;'
+    })
+  }
+}
+
+function addCloseButton(dialog) {
+  if ( dialog.querySelector('.modal_close') != null ) return;
+  const modalClose = `<button class="modal_close" aria-label="close modal"></button>`;
+  dialog.innerHTML += modalClose;
+  const closeBtn = dialog.querySelector('.modal_close');
+  closeBtn.onclick = () => { closeModal(dialog) };
+}
+
+function closeModal(target) {
+  let targetIframe = target.querySelector('iframe');
+  target.close();
+  target.querySelector('.modal').classList.remove('top','right','bottom','left');
+  if ( targetIframe != null ) targetIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*')
+  closeHandler();
+}
+
+function closeOpenModal() {
+  const allDialog = document.querySelectorAll('dialog');
+  allDialog.forEach( (dialog) => {
+    if(dialog.hasAttribute('open')) closeModal(dialog)
+  })
+}
+
+const openHandler = () => { document.querySelector('html').style.overflow = 'hidden'; }
+const closeHandler = () => { document.querySelector('html').style.overflow = 'auto'; }
+
+
+// Carousels
+
+const startCarousels = () => {
+  const carousels = document.querySelectorAll('.carousel');
+  if ( carousels == undefined ) return
+  if ( carousels == null ) return
+  carousels.forEach((carousel) => {
+    setup(carousel); // build the carousel
+
+    const wrapper = carousel.querySelector('.wrapper-carousel');
+    const filler = carousel.querySelector('.filler-carousel');
+    const slider = carousel.querySelector('.content-carousel');
+    const slides = Array.prototype.slice.call( slider.children );
+    const btnPrev = carousel.querySelector('.prev-slide');
+    const btnNext = carousel.querySelector('.next-slide');
+    const dots = carousel.querySelector('.dots-carousel');
+    const dote = Array.prototype.slice.call( dots.children );
+
+    let trackLength = getTrackSize(carousel).length,
+        trackActiveSlide = 1,
+        slideDirection,
+        slideStartX,
+        slideMoveX,
+        slideDragDistance,
+        translationComplete = true; // prevents multiple event triggers
+
+    let carouselStarted = false, // user input has happened
+        carouselPressed = false, // user is holding mouse-1
+        carouselMoving = false, // user is moving mouse-1
+        carouselAnimating = false, // carousel transition is in progress
+        carouselHovered = false, // mouse cursor is inside the container
+        carouselDragged = false;  // carousel was moved
+
+    toggleStates();
+    autoPlay();
+
+    slider.addEventListener('transitionend', transitionEnd, false);
+    slider.addEventListener('transitionend', transitionCompleted, true);
+
+    wrapper.addEventListener("mousedown", (e) => handleDown(e));
+    wrapper.addEventListener("mouseenter", (e) => handleEnter(e));
+    wrapper.addEventListener("mouseleave", (e) => handleLeave(e));
+    wrapper.addEventListener("mouseup", (e) => handleUp(e));
+    wrapper.addEventListener("mousemove", (e) => handleMove(e));
+    wrapper.addEventListener('touchstart', (e) => handleDown(e));
+    wrapper.addEventListener('touchend', (e) => handleUp(e));
+    wrapper.addEventListener('touchcancel', (e) => handleUp(e));
+    wrapper.addEventListener('touchmove', (e) => handleMove(e));
+
+    btnPrev.addEventListener('click', (e) => {
+      previousSlide();
+      e.stopPropagation();
+    });
+
+    btnNext.addEventListener('click', (e) => {
+      nextSlide();
+      e.stopPropagation();
+    });
+
+    dote.forEach((dot) => {
+      dot.onclick = (dotTarget) => skipSlide(dotTarget);
+    })
+
+    carousel.addEventListener('mouseenter', () => carouselHovered = true);
+    carousel.addEventListener('mouseleave', () => carouselHovered = false);
+
+    /* supporting functions */
+
+    function toggleStates() {
+      //SLIDES
+      slides.forEach((slide) => slide.removeAttribute('active'))
+      slides[trackActiveSlide - 1].setAttribute('active','')
+      //DOTS
+      dote.forEach((dot) => { dot.removeAttribute('active'); });
+      dote[trackActiveSlide - 1].setAttribute('active','');
+      //FILLER
+      filler.innerHTML = ``;
+      let trackActiveSlideNum = trackActiveSlide - 1;
+      let beforeSlideNum = ( trackActiveSlideNum == 0 ) ? trackLength - 1 : trackActiveSlideNum - 1;
+      let afterSlideNum = ( trackActiveSlideNum == trackLength - 1 ) ? 0 : trackActiveSlideNum + 1;
+      let fillerSlider = [];
+      fillerSlider[0] = slides[beforeSlideNum].cloneNode(true);
+      fillerSlider[1] = slides[afterSlideNum].cloneNode(true);
+      fillerSlider.forEach((slide, index) => {
+        filler.appendChild(slide)
+        slide.style.flexBasis = `100%`
+        if ( index == 0 ) slide.style.transform = `translateX(-100%)`;
+      })
+    }
+
+    function moveSlide() {
+      if ( slideDirection == 0 ) return;
+      wrapper.style.justifyContent = (slideDirection == 1) ? 'flex-end' : 'flex-start';
+      slider.style.transform = `translate(${(slideDirection * 100) / trackLength}%)`;
+      toggleStates();
+
+      carouselMoving = true;
+      carouselAnimating = true;
+      carouselDragged = false;
+    }
+
+    function previousSlide() {
+      if (translationComplete === false) return;
+      translationComplete = false;
+      carouselStarted = true;
+
+      if (slideDirection != 1) slider.appendChild(slider.firstElementChild);
+      slideDirection = 1
+      trackActiveSlide--
+      if ( trackActiveSlide < 1 ) trackActiveSlide = trackLength
+
+      moveSlide()
+    }
+
+    function nextSlide() {
+      if (translationComplete === false) return;
+      translationComplete = false;
+      carouselStarted = true;
+
+      if ( slideDirection == 1 ) slider.prepend(slider.lastElementChild)
+      slideDirection = -1
+      trackActiveSlide++
+      if ( trackActiveSlide > trackLength ) trackActiveSlide = 1
+
+      moveSlide()
+    }
+
+    function skipSlide(dot) {
+      if (translationComplete === false) return;
+      translationComplete = true;
+      carouselStarted = true;
+      carouselAnimating = true;
+
+      let activeSlide = trackActiveSlide;
+      let targetSlide = parseInt(dot.target.dataset.target , 10);
+      let repeat = Math.abs(activeSlide - targetSlide);
+      slideDirection = (activeSlide > targetSlide) ? 1 : -1;
+      if ( activeSlide == targetSlide) return;
+
+      let mapping = [];
+
+      const setMapping = () => {
+        if ( slideDirection > 0 ) {
+          mapping[trackLength - 1] = targetSlide; // last slide is moved to front
+          for (let i = 0; i < trackLength - 1; i++) {
+            mapping[i] = ( i + targetSlide + 1 ) % trackLength
+          }
+        }
+        if ( slideDirection < 0 ) {
+          mapping[0] = targetSlide - 2; // first slide is moved to end
+          for (let i = 1; i < trackLength; i++) {
+            mapping[i] = ( i + targetSlide - 2 ) % trackLength
+          }
+        }
+      }
+
+      const newMapping = () => {
+        mapping.forEach((map) => {
+          if ( slideDirection > 0 ) slider.appendChild(slides[map])
+          if ( slideDirection < 0 ) slider.appendChild(slides[map])
+        })
+      }
+
+      wrapper.style.justifyContent = (slideDirection == 1) ? 'flex-end' : 'flex-start';
+
+      if ( slideDirection > 0 ) {
+        setMapping()
+        newMapping()
+
+        for (let i = 0; i < repeat; i++) {
+          trackActiveSlide--
+          toggleStates();
+        }
+      }
+
+      if ( slideDirection < 0 ) {
+        setMapping()
+        newMapping()
+
+        for (let i = 0; i < repeat; i++) {
+          trackActiveSlide++
+          toggleStates();
+        }
+      }
+
+      slider.style.transform = `translate(${(slideDirection * 100) / trackLength}%)`;
+      carouselMoving = true;
+    }
+
+    function transitionCompleted() {
+      translationComplete = true;
+    }
+
+    function transitionEnd() {
+      if ( !carouselStarted ) return; // prevents slider reordering before input
+      if ( !carouselMoving ) return; // prevents slider from reordering before next/prev functions
+
+      if (slideDirection === 1) {
+        slider.prepend(slider.lastElementChild);
+      } else {
+        slider.appendChild(slider.firstElementChild);
+      }
+
+      carouselMoving = false;
+      filler.style.transition = 'none';
+      filler.style.transform = 'translate(0)';
+      slider.style.transition = 'none';
+      slider.style.transform = 'translate(0)';
+      setTimeout(() => {
+        filler.style.transition = `transform ${carousel.dataset.transition}ms ease`
+        slider.style.transition = `transform ${carousel.dataset.transition}ms ease`
+      })
+
+      carouselAnimating = false;
+    }
+
+    function handleDown(e) {
+      e.stopPropagation();
+      carouselPressed = true;
+      slideMoveX = (e.offsetX != undefined) ? e.offsetX : e.touches[0].pageX - e.touches[0].target.offsetLeft;
+      slideStartX = ( slideDirection != 1 ) ? slideMoveX - slider.offsetLeft : slideMoveX ;
+      wrapper.style.cursor = "grabbing";
+    }
+
+    function handleEnter(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      wrapper.style.cursor = "grab";
+    }
+
+    function handleLeave(e) {
+      if(carouselAnimating) return;
+      e.stopPropagation();
+      e.preventDefault();
+      wrapper.style.cursor = "auto";
+      filler.style.transform = `translate(0)`;
+      slider.style.transform = `translate(0)`;
+      carouselPressed = false;
+    }
+
+    function handleUp(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      wrapper.style.cursor = "grab";
+      carouselPressed = false;
+
+      filler.style.transform = `translate(0)`;
+      slider.style.transform = `translate(0)`;
+      if (carouselDragged) {
+        if ( slideDragDistance == 0 ) return;
+        if ( slideDragDistance > 15 ) previousSlide();
+        if ( slideDragDistance < -15 ) nextSlide();
+      }
+    }
+
+    function handleMove(e) {
+      if ( !carouselPressed ) return;
+      carouselDragged = true;
+      e.stopPropagation();
+      e.preventDefault();
+      slideMoveX = (e.offsetX != undefined) ? e.offsetX : e.touches[0].pageX - e.touches[0].target.offsetLeft;
+      slideDragDistance = ( (slideMoveX - slideStartX) /getTrackSize(carousel).slide )*100;
+      filler.style.transform = `translate(${slideMoveX - slideStartX}px)`;
+      slider.style.transform = `translate(${slideMoveX - slideStartX}px)`;
+    }
+
+    function autoPlay() {
+      if ( carousel.dataset.autoplay == null ) return;
+      if ( carousel.dataset.autoplay == undefined ) return;
+      if ( carousel.dataset.autoplay == 0 ) return;
+      if (window.matchMedia("(pointer: coarse)").matches) return;
+
+      setInterval( () => {
+        if (carouselHovered) return;
+        nextSlide()
+      }, (carousel.dataset.autoplay <= 5000 ) ? 5000 : carousel.dataset.autoplay);
+    }
+
+  }) //end of carousels forEach()
+
+}
+
+function setup(carousel) {
+  const contents = Array.prototype.slice.call( carousel.children );
+  const wrapper = document.createElement('div');
+  const slider = document.createElement('div');
+  const filler = document.createElement('div');
+  const navs = document.createElement('div');
+  const dots = document.createElement('ul');
+  const dot = document.createElement('li');
+  const btnNext = document.createElement('button');
+  const btnPrev = document.createElement('button');
+
+  wrapper.classList.add('wrapper-carousel');
+  slider.classList.add('content-carousel');
+  filler.classList.add('filler-carousel');
+  navs.classList.add('nav-carousel');
+  dots.classList.add('dots-carousel');
+  btnNext.classList.add('next-slide');
+  btnPrev.classList.add('prev-slide');
+
+  btnPrev.innerHTML = '<';
+  btnNext.innerHTML = '>';
+  navs.append(btnPrev);
+  navs.append(btnNext);
+  carousel.append(wrapper);
+  carousel.append(navs);
+  carousel.append(dots);
+  wrapper.append(filler);
+  wrapper.append(slider);
+
+  contents.forEach((c, index) => {
+    slider.append(c)
+    c.dataset.slide = index + 1
+    c.style.flexBasis = `${100 / contents.length}%`
+  });
+
+  filler.style.transition = `transform ${carousel.dataset.transition}ms ease`;
+  slider.style.transition = `transform ${carousel.dataset.transition}ms ease`;
+  slider.style.flexBasis = `${contents.length * 100}%`
+
+  for (let i = 0; i < contents.length; i++) {
+    dot.dataset.target = i + 1
+    dots.appendChild(dot.cloneNode(true))
+  }
+
+  carousel.classList.add('loaded')
+}
+
+function getTrackSize(carousel) {
+  let trackWidth = parseInt(carousel.querySelector('.content-carousel').scrollWidth, 10);
+  let trackLength = parseInt(carousel.querySelector('.content-carousel').childElementCount, 10);
+  let specs = new Array();
+  specs['width'] = trackWidth;
+  specs['length'] = trackLength;
+  specs['slide'] = parseInt(trackWidth / trackLength, 10);
+  return specs;
+}
+
+// Accordions
+
+const initializeAccordions = () => {
+  const accordionEle = Array.from(document.querySelectorAll('dl.accordion'))
+  accordionEle.forEach((accordion) => {
+    let accordionID = (accordion.getAttribute('id') == null) ?  accordionUID() : accordion.getAttribute('id')
+    accordion.setAttribute('id',accordionID)
+    accordion.setAttribute('role','presentation')
+
+    const acDD = accordion.querySelectorAll('dd'),
+          acDT = accordion.querySelectorAll('dt'),
+          firstButton = accordion.querySelector('dt:first-of-type'),
+          firstPanel = accordion.querySelector('dd:first-of-type')
+
+    acDD.forEach((dd,index) => {
+      dd.setAttribute('id', accordionID + '_DD' + index)
+      dd.setAttribute('aria-labelledby', accordionID + '_DT' + index)
+      dd.setAttribute('aria-hidden',true)
+      // dd.setAttribute('role', 'region')
+    })
+
+    acDT.forEach((dt,index) => {
+      const dtButton = document.createElement('button')
+            dtButton.innerHTML = dt.innerHTML
+            dtButton.setAttribute('id', accordionID + '_DT' + index)
+            dtButton.setAttribute('aria-controls', accordionID + '_DD' + index)
+            dtButton.setAttribute('aria-expanded',false)
+
+      dt.innerHTML = ``
+      dt.append(dtButton)
+      // dt.setAttribute('role', 'tab')
+
+      dtButton.addEventListener('click', e => {
+        let thisButton = e.target,
+            targetPanel = thisButton.parentElement.nextElementSibling
+        toggleOpen(thisButton,targetPanel)
+      })
+
+      dtButton.addEventListener('keypress', e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          let thisButton = e.target,
+              targetPanel = thisButton.parentElement.nextElementSibling
+
+          toggleOpen(thisButton,targetPanel)
+        }
+      })
+
+      function toggleOpen(button,panel) {
+        let siblingDT = Array.from(button.parentElement.parentElement.querySelectorAll('dt')),
+            siblingDD = Array.from(button.parentElement.parentElement.querySelectorAll('dd'))
+
+        if ( button.getAttribute('aria-expanded') == true) return
+
+        siblingDT.forEach((dt) => dt.querySelector('button').setAttribute('aria-expanded',false))
+        siblingDD.forEach((dd) => dd.setAttribute('aria-hidden',true))
+
+        button.setAttribute('aria-expanded',true)
+        panel.setAttribute('aria-hidden',false)
+      }
+
+      return false;
+    })
+
+    firstButton.querySelector('button').setAttribute('aria-expanded',true)
+    firstPanel.setAttribute('aria-hidden',false)
+  })
+}
+
+let accordionUIDN = 0
+const accordionUID = () => {
+  const randomness = Math.random().toString().substr(12);
+  accordionUIDN++
+  return 'accordion' + accordionUIDN + '_' + randomness;
+}
+
+// Clocks
+
+/**/
+const getTimeRemaining = (endtime) => {
+
+  var myEndTime = (typeof endtime == 'string') ? new Date(endtime) : endtime;
+  var t = myEndTime - new Date().getTime();
+	var seconds = Math.floor((t / 1000) % 60);
+	var minutes = Math.floor((t / 1000 / 60) % 60);
+	var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+	var days = Math.floor(t / (1000 * 60 * 60 * 24));
+	return {
+		'total': t,
+		'days': days,
+		'hours': hours,
+		'minutes': minutes,
+		'seconds': seconds
+	};
+}
+// */
+
+
+const initializeClock = () => {
+  const timers = document.querySelectorAll('.timer');
+  let numDays, numHours, numMinutes, numSeconds;
+
+  timers.forEach((timer) => {
+    let regionOffset = (typeof localOffSet !== 'undefined' && null !== localOffSet) ? (localOffSet/60*100) : '';
+    let datadate = (timer.dataset.date).replace(".000", " " + regionOffset);
+
+    let datarange = timer.dataset.range;
+    //let dataservertime = timer.dataset.servertime;
+
+    let clientTime = new Date().getTime();
+
+    let properServerTime = (typeof localServerTime !== 'undefined' && null !== localServerTime) ? localServerTime : false;
+    let serverTime = (properServerTime) ? properServerTime : 0;
+
+    let diff =  clientTime - serverTime;
+    let myNewDate = new Date(datadate) - diff;
+
+    const updateClock = () => {
+      var t = getTimeRemaining(myNewDate);
+      numDays = ('' + t.days).slice(-4);       // set to only display 2 digits
+      numHours = ('0' + t.hours).slice(-2);
+      numMinutes = ('0' + t.minutes).slice(-2);
+      numSeconds = ('0' + t.seconds).slice(-2);
+      if (t.total <= 0) {
+        clearInterval(timeinterval);
+        numDays = '00';
+        numHours = '00';
+        numMinutes = '00';
+        numSeconds = '00';
+      }
+
+      const divDays = `<div class="days" role="timer" aria-label="days"><p>${numDays}</p></div>`;
+      const divHours = `<div class="hours" role="timer" aria-label="hours"><p>${numHours}</p></div>`;
+      const divMinutes = `<div class="minutes" role="timer" aria-label="minutes"><p>${numMinutes}</p></div>`;
+      const divSeconds = `<div class="seconds" role="timer" aria-label="seconds"><p>${numSeconds}</p></div>`;
+      let timerbody = ``;
+      if ( datarange == undefined ) {
+        timerbody = divDays + divHours + divMinutes + divSeconds
+      } else {
+        if ( datarange.includes('d')) timerbody += divDays;
+        if ( datarange.includes('h')) timerbody += divHours;
+        if ( datarange.includes('m')) timerbody += divMinutes;
+        if ( datarange.includes('s')) timerbody += divSeconds;
+      }
+      timer.innerHTML = timerbody;
+    }
+    updateClock();
+
+    var timeinterval = setInterval(updateClock, 1000)
+
+  });
+}
+
+// ModalsGallery
+
+const startModalsGallery = () => {
+  const galleryItems = document.querySelectorAll('.gallery')
+
+  galleryItems.forEach( (item,index) => {
+    const newItem = checkGalleryEle(item),
+          imageItem = newItem.querySelector('img'),
+          imageAlt = imageItem.getAttribute('alt'),
+          imageTarget = imageItem.outerHTML.replace('-thumb','')
+
+    let newModalContent = `
+      <div class="modal-wrap modal-gallery">
+        <div class="modal" alt="${imageAlt}">
+          ${imageTarget}
+        </div>
+      </div>`
+
+    const newModal = document.createElement('dialog')
+          newModal.setAttribute('aria-modal',true)
+          newModal.setAttribute('id','gallery-' + index)
+          newModal.innerHTML = newModalContent
+
+    const newButton = document.createElement('button')
+          newButton.dataset.modal = "#gallery-" + index
+          newButton.dataset.animation = "top"
+          newButton.style.position = "absolute"
+          newButton.style.inset = "0"
+
+    newItem.style.position = "relative"
+    newItem.append(newButton)
+
+    document.querySelector('body').append(newModal)
+    item.replaceWith(newItem)
+  })
+}
+
+function checkGalleryEle(gallery) {
+  if (gallery.tagName == 'FIGURE') return gallery
+
+  let galleryClasses = Array.from(gallery.classList)
+  let galleryIds = gallery.getAttribute('id')
+      galleryIds = (galleryIds == null) ? '' : galleryIds
+
+  gallery.classList.remove(...galleryClasses)
+  gallery.setAttribute('id','')
+
+  const newFigure = document.createElement('figure')
+        newFigure.innerHTML = gallery.outerHTML
+        newFigure.classList.add(...galleryClasses)
+        newFigure.setAttribute('id',galleryIds)
+
+  return newFigure
+}
+
+// ModalsVideo
+
+const startModalsVideo = () => {
+  // delegation required for elements inside dialog elements
+  delegateEvent("click", "attribute", "data-youtube", e => {
+    createIframe(e.target.dataset.youtube);
+    openIframe(e.target.dataset.youtube);
+  });
+
+  const checkIfExists = (id) => {
+    let youtubeModal = document.querySelector(`#youtube-${id}`);
+    if ( youtubeModal == null ) return;
+    if ( youtubeModal == undefined ) return;
+    let existingID = ( youtubeModal != null ) ? true : false;
+    return existingID;
+  }
+
+  const createIframe = (id) => {
+    if ( checkIfExists(id) == true ) return;
+    let videoObject = document.createElement('dialog');
+    const youtubeFrame = `<div class="modal-wrap"><div class="modal modal-video">
+      <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&enablejsapi=1" frameborder="0" autoplay;" allowfullscreen></iframe></div></div>`;
+    videoObject.setAttribute('id', "youtube-" + id);
+    videoObject.classList.add('youtubeModal');
+    videoObject.innerHTML = youtubeFrame;
+    addCloseButton(videoObject);
+    document.querySelector('html').appendChild(videoObject);
+  }
+
+  const openIframe = (target) => {
+    closeOpenDialog();
+
+    let targetID = `#youtube-${target}`;
+    let youtubeModal = document.querySelector(targetID);
+    let targetIframe = youtubeModal.querySelector('iframe');
+    youtubeModal.showModal();
+
+    if ( targetIframe != null ) targetIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*')
+    openHandler();
+
+    youtubeModal.onclick = (e) => {
+      if (e.target.tagName !== 'DIALOG') return; //This prevents issues with forms
+      closeModal(e.target);
+    };
+  }
+}
+
+  // ScrollFX
+
+const initializeScrollFX = (target = '[scrollfx]', threshold = 0, rootmargin = "0px") => {
+  let currentPosition = 0
+  const soss = Array.from(document.querySelectorAll(target))
+  if (soss == undefined) return
+  if (soss == "") return
+
+  if("IntersectionObserver" in window){
+    // Set .visible only when object is inside the viewport
+    const sossVisible = new IntersectionObserver(entries => {
+      entries.forEach( entry => {
+        entry.target.classList.toggle('visible', entry.isIntersecting)
+      });
+    }, {
+      threshold: threshold,
+      rootMargin: rootmargin
+    });
+
+    // Set .triggered once when object in inside the viewport
+    const sossTriggered = new IntersectionObserver(entries => {
+      entries.forEach( entry => {
+        entry.target.classList.toggle('triggered', entry.isIntersecting)
+        if (entry.isIntersecting) sossTriggered.unobserve(entry.target)
+      });
+    }, {
+      threshold: threshold,
+      rootMargin: rootmargin
+    });
+
+    soss.forEach(sos => {
+      sossVisible.observe(sos)
+      sossTriggered.observe(sos)
+    })
+  }
+
+  window.addEventListener('scroll', (e) => {
+    let scrollPosition = Math.round(window.scrollY);
+    soss.forEach( (sos) => {
+      objectPushOrPull(sos,scrollPosition,currentPosition)
+      objectTopOrBottom(sos)
+      objectCentered(sos)
+      objectParallax(sos,scrollPosition)
+    })
+    currentPosition = scrollPosition
+  })
+
+  document.addEventListener("DOMContentLoaded", () => {
+    soss.forEach( (sos) => {
+      objectTopOrBottom(sos)
+      objectCentered(sos)
+    })
+  })
+
+  document.addEventListener("mousemove", (e) => {
+    e.stopPropagation
+    soss.forEach( (sos) => {
+      mouseParallax(e,sos)
+    })
+  })
+
+  // Mobile Devices from here on
+  if (!checkMobileDevice()) return
+
+  window.addEventListener("deviceorientation", e => {
+    e.stopPropagation()
+    e = e || window.event
+
+    soss.forEach( (sos) => {
+      gyroParallax(e,sos)
+    })
+  })
+}
+
+// Set .pushed or .pulled once document has been scrolled by the set distance on data-scroll-distance
+function objectPushOrPull(sos,scrollPosition,currentPosition) {
+  let scrollDistance = sos.dataset.scrollDistance;
+  if (scrollDistance == undefined) return
+  if (scrollPosition > currentPosition && scrollPosition > scrollDistance ) {
+    sos.classList.add('pushed')
+    sos.classList.remove('pulled')
+  }
+  if (scrollPosition < currentPosition) {
+    sos.classList.remove('pushed')
+    sos.classList.add('pulled')
+  }
+}
+
+// Set .topped or .bottomed when object scrolls to or beyond the top or bottom of the viewport
+function objectTopOrBottom(sos) {
+  let windowBounds = window.innerHeight
+  let sosBounds = sos.getBoundingClientRect()
+  if (sosBounds.top <= 0) {
+    sos.classList.add('topped')
+    sos.classList.remove('bottomed')
+  } else if (sosBounds.bottom >= windowBounds) {
+    sos.classList.add('bottomed')
+    sos.classList.remove('topped')
+  } else {
+    sos.classList.remove('bottomed')
+    sos.classList.remove('topped')
+  }
+}
+
+// Set .centered when object top reached the middle of the window.innerHeight
+function objectCentered(sos) {
+  let windowBounds = window.innerHeight
+  let sosBounds = sos.getBoundingClientRect()
+  if ( sosBounds.top >= (windowBounds/5) && sosBounds.top < (windowBounds/5*4) ) {
+    sos.classList.add('centered')
+  } else {
+    sos.classList.remove('centered')
+  }
+}
+
+// [data-scroll-speed] controls speed increase
+// [parallaxbg] changes method to apply parallax to a background
+function objectParallax(sos,scrollPosition) {
+  let scrollSpeed = sos.dataset.scrollSpeed
+  if (scrollSpeed == undefined) return
+  let sosBounds = sos.getBoundingClientRect()
+
+  if (sos.hasAttribute('parallaxbg')) {
+    let sosBgPos = '0 ' + (sosBounds.top * scrollSpeed * -1) + 'px'
+    sos.style.backgroundPosition = sosBgPos;
+  }
+
+  if (!sos.hasAttribute('parallaxbg')) {
+    sos.style.translate = '0 ' + (scrollPosition * scrollSpeed * -1) + 'px'
+  }
+}
+
+// [data-shift-speed] controls speed increase
+function mouseParallax(event,object) {
+  let shiftSpeed = object.dataset.shiftSpeed
+  let lockX = (object.dataset.lockX) ? 0 : 1
+  let lockY = (object.dataset.lockY) ? 0 : 1
+  if (shiftSpeed == undefined) return
+  let x = ((window.innerWidth/2) - event.pageX) * shiftSpeed / 10 * lockX
+  let y = ((window.innerHeight/2) - event.pageY) * shiftSpeed / 10 * lockY
+
+  object.style.transform = `translateX(${x}px) translateY(${y}px)`
+}
+function gyroParallax(event,object) {
+  let shiftSpeed = object.dataset.shiftSpeed
+  let lockX = (object.dataset.lockX) ? 0 : 1
+  let lockY = (object.dataset.lockY) ? 0 : 1
+  if (shiftSpeed == undefined) return
+  let gamma = (event.gamma) * shiftSpeed * lockX
+  let beta = (event.beta) * shiftSpeed / 2 * lockY
+
+  object.style.transform = `translateX(${gamma}px) translateY(${beta}px)`
+}
+
+// Tabs
+
+const initializeTabs = () => {
+  const tabNavigations = document.querySelectorAll('.tab-navs'),
+        tabContents = document.querySelectorAll('.tab-contents')
+
+  tabNavigations.forEach(nav => {
+    let tabNavTarget = nav.dataset.target,
+        tabNavButtons = Array.from(nav.children)
+
+    nav.setAttribute('role','tablist')
+
+    tabNavButtons.forEach((button,index) => {
+      button.setAttribute('aria-selected',false)
+      button.setAttribute('aria-controls', tabNavTarget + '_panel' + index)
+      button.setAttribute('id', tabNavTarget + '_button' + index)
+      button.setAttribute('role','tab')
+      if (index == 0) button.setAttribute('aria-selected',true)
+    })
+  })
+
+  tabContents.forEach(con => {
+    let tabGroupID = con.getAttribute('id'),
+        tabPanels = Array.from(con.children)
+
+    tabPanels.forEach((panel,index) => {
+      panel.setAttribute('id',tabGroupID + '_panel' + index)
+      panel.setAttribute('role','tabpanel')
+      panel.setAttribute('aria-labelledby', tabGroupID + '_button' + index)
+      panel.setAttribute('tabindex',-1)
+      panel.setAttribute('aria-expanded',false)
+      if (index == 0) {
+        panel.setAttribute('tabindex',0)
+        panel.setAttribute('aria-expanded',true)
+      }
+    })
+  })
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('[role="tab"]'),
+          tabList = document.querySelector('[role="tablist"]')
+    let tabFocus = 0
+
+    if ( tabs == undefined ) return
+    if ( tabList == undefined ) return
+
+    tabs.forEach((tab) => tab.addEventListener('click', changeTabs))
+
+    tabList.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+
+        tabs[tabFocus].setAttribute("tabindex", -1)
+        if (e.key === 'ArrowRight') {
+          tabFocus++
+          if (tabFocus >= tabs.length) tabFocus = 0
+        } else if (e.key === 'ArrowLeft') {
+          tabFocus--
+          if (tabFocus < 0) tabFocus = tabs.length - 1
+        }
+
+        tabs[tabFocus].setAttribute('tabindex', 0)
+        tabs[tabFocus].focus()
+      }
+    })
+  })
+
+  function changeTabs(e) {
+    const thisButton = e.target,
+          thisTablist = thisButton.parentNode,
+          targetPanel = document.querySelector('#' + thisButton.getAttribute('aria-controls')),
+          targetGroup = targetPanel.parentElement
+
+    Array.from(thisTablist.children).forEach(button => {
+      button.setAttribute('aria-selected',false)
+    })
+    thisButton.setAttribute('aria-selected',true)
+
+    Array.from(targetGroup.children).forEach(panel => {
+      panel.setAttribute('tabindex',-1)
+      panel.setAttribute('aria-expanded',false)
+    })
+    targetPanel.setAttribute('tabindex',0)
+    targetPanel.setAttribute('aria-expanded',true)
+  }
+}
+
+// Tooltips
+
+
+const initializeToolTips = () => {
+  let windowWidth;
+  let windowHeight;
+  let windowWHalf;
+  let windowHHalf;
+  const getWindow = () => {
+    windowWidth = window.innerWidth;
+    windowHeight = window.innerHeight;
+    windowWHalf = windowWidth / 2;
+    windowHHalf = windowHeight / 2;
+  }
+  getWindow();
+  window.onresize = () => {
+    getWindow();
+    modelessClose();
+  }
+
+  delegateEvent("mouseover", "class", "tooltip", e => {
+    if (checkMobileDevice() == false) modelessOpen(e);
+  });
+  delegateEvent("mouseout", "class", "tooltip", e => {
+    modelessClose();
+  });
+  delegateEvent("click", "class", "tooltip", e => {
+    if (checkMobileDevice() == true) modelessOpen(e);
+  });
+  document.addEventListener('scroll',(e) => {
+    setTimeout(() => {
+      if (checkMobileDevice() == true) modelessClose()
+    }, 100);
+    e.preventDefault()
+  })
+
+  const modelessCreate = (a,b) => {
+    if ( a == null && b == null ) return;
+    if ( a == null && b != null ) modelessInsert(`<div class="tooltip-alt tooltip-element"><p>${b}</p></div>`);
+    if ( a != null ) {
+      let targetID = `#${a}`;
+      if ( document.querySelector(targetID) == null ) return;
+      let tooltipContents = `<div class="tooltip-id">${document.querySelector(targetID).innerHTML}</div>`;
+      modelessInsert(tooltipContents);
+    }
+  }
+
+  const modelessOpen = (e) => {
+    let thisID = e.target.dataset.target;
+    let thisAlt = e.target.getAttribute('alt');
+    let mouseXpos = e.pageX;
+    let mouseYpos = e.pageY;
+    modelessClose();
+    modelessCreate(thisID,thisAlt);
+
+    modelessPositionFixed(e,mouseXpos,mouseYpos);
+  }
+
+  const modelessClose = () => {
+    document.querySelectorAll('.modeless').forEach((item) => item.remove());
+    return;
+  }
+
+  const modelessInsert = (e) => {
+    let modelessObject = document.createElement('div');
+    modelessObject.classList.add('modeless');
+    modelessObject.style.position = 'absolute';
+    modelessObject.innerHTML = e;
+    document.querySelector('html').appendChild(modelessObject);
+  }
+
+  const modelessPositionFree = (x,y) => {
+    getWindow();
+    const modelessEle = document.querySelector('.modeless');
+    const modelessEleStyle = window.getComputedStyle(modelessEle);
+    let mouseYrelpos = y - window.scrollY;
+    if ( x > windowWHalf ) x = x - parseInt(modelessEleStyle.getPropertyValue('width'), 10);
+    if ( mouseYrelpos > windowHHalf ) y = y - parseInt(modelessEleStyle.getPropertyValue('height'), 10);
+    modelessEle.style.top = `${y}px`;
+    modelessEle.style.left = `${x}px`;
+  }
+
+  const modelessPositionFixed = (e,x,y) => {
+    getWindow();
+    const tooltipButton = e.target.getBoundingClientRect();
+    const modelessEle = document.querySelector('.modeless');
+    let mouseYrelpos = y - window.scrollY;
+
+    x = tooltipButton.x;
+    y = tooltipButton.y + document.documentElement.scrollTop + tooltipButton.height + 6;
+
+    if ( x > windowWHalf ) x = tooltipButton.width + tooltipButton.x - modelessEle.getBoundingClientRect().width;
+    if ( mouseYrelpos > windowHHalf ) y = tooltipButton.y + document.documentElement.scrollTop - modelessEle.getBoundingClientRect().height - 6;
+
+    modelessEle.style.left = `${x}px`;
+    modelessEle.style.top = `${y}px`;
+  }
+}
+
+//Dependent Order
+//try{startModals();}catch(e){console.log(e);}
+
+
+//try{startModalsVideo();}catch(e){console.log(e);}
+//try{startCarousels();}catch(e){console.log(e);}
+
+//Independent Order
+//try{initializeAccordions();}catch(e){console.log(e);}
+//try{initializeClock();}catch(e){console.log(e);}
+//try{initializeScrollFX();}catch(e){console.log(e);}
+//try{initializeTabs();}catch(e){console.log(e);}
+//try{initializeToolTips();}catch(e){console.log(e);}
+// initializeHamburger();
+// initializePopOvers();

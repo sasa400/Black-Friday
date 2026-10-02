@@ -1,0 +1,180 @@
+let openNavMain = document.getElementById('openNavMain')
+let openNavFilter = document.getElementById('openNavFilter')
+let openNavWallet = document.getElementById('openNavWallet')
+let menuNavMain = document.getElementById('menuNavMain')
+let menuNavFilter = document.getElementById('menuNavFilter')
+let menuNavWallet = document.getElementById('menuNavWallet')
+let mainHTML = document.querySelector('html')
+let menuCloseButton = document.createElement('div')
+    menuCloseButton.classList.add('icon', 'cfshop-icon-close')
+let pageFooter = document.querySelector('footer')
+
+let openNavArray = [
+  {
+    button: openNavMain,
+    menu: menuNavMain
+  },
+  {
+    button: openNavFilter,
+    menu: menuNavFilter
+  },
+  {
+    button: openNavWallet,
+    menu: menuNavWallet
+  }
+]
+
+openNavArray.forEach( (arrEle) => {
+  if (arrEle.button == null) return
+  arrEle.button.addEventListener('click', () => {
+    closeAllMenus()
+    arrEle.menu.classList.add('open')
+
+    if (arrEle.menu.querySelector('.cfshop-icon-close')) return
+    let closeBtn = menuCloseButton.cloneNode(true)
+        closeBtn.addEventListener('click', () => closeAllMenus() )
+    arrEle.menu.appendChild(closeBtn)
+  })
+
+  document.addEventListener('click', (event) => {
+    if (!arrEle.menu.classList.contains('open')) return
+    if (!arrEle.menu.contains(event.target) && !arrEle.button.contains(event.target)) closeAllMenus()
+  })
+})
+
+window.addEventListener("resize", (e) => {
+  closeAllMenus()
+})
+
+document.addEventListener('keydown',(e) => {
+  if (e.isComposing || e.key === "Escape") {
+    closeAllMenus()
+  }
+})
+
+document.addEventListener("scroll", (e) => {
+  closeAllMenus()
+})
+
+function closeAllMenus() {
+  openNavArray.forEach( (arrEle) => {
+    if (arrEle.button == null) return
+    arrEle.menu.classList.remove('open')
+  })
+}
+
+
+let toggleLightMode = document.getElementById('toggleLightMode')
+let toggleDarkMode = document.getElementById('toggleDarkMode')
+
+let toggleThemeArray = [
+  {
+    button: toggleLightMode,
+    theme: 'lightmode'
+  },
+  {
+    button: toggleDarkMode,
+    theme: 'darkmode'
+  }
+]
+
+toggleThemeArray.forEach( (arrEle) => {
+  if (arrEle.button == null) return
+  arrEle.button.addEventListener('click', (e) =>{
+    mainHTML.classList.remove('lightmode', 'darkmode')
+    mainHTML.classList.add(arrEle.theme)
+    localStorage.setItem('theme',arrEle.theme)
+    toggleFooterTheme(arrEle.theme)
+  })
+})
+
+// document.addEventListener("DOMContentLoaded", (event) => {
+//   let storedTheme = localStorage.getItem('theme')
+//   if (storedTheme == null) storedTheme = 'darkmode'
+//   mainHTML.classList.remove('lightmode','darkmode')
+//   mainHTML.classList.add(storedTheme)
+// })
+
+window.addEventListener('load', (event) => {
+  let storedTheme = localStorage.getItem('theme')
+  toggleFooterTheme(storedTheme)
+})
+
+function toggleFooterTheme(theme) {
+  let footerCIBI = pageFooter.querySelector('.footer__cibi-local')
+  let logoTheme = (theme == 'lightmode') ? 'black' : 'white'
+  let logoImages = Array.from(footerCIBI.children)
+  logoImages.forEach((image) => {
+    let src = image.getAttribute('src')
+    let newsrc = src.replace(/(black|white)/, logoTheme)
+    image.setAttribute('src', newsrc);
+  })
+}
+
+
+
+let dropdownEle = document.querySelectorAll('.dropdown')
+
+dropdownEle.forEach( (dropdownObj) => {
+  let dropdownContent = dropdownObj.querySelector('.dropdown_content')
+  let dropdownButton = dropdownObj.querySelector('.dropdown_button')
+
+  dropdownObj.addEventListener('mouseenter', (e) => {
+    if(checkMobileDevice()) return
+    dropdownContent.style.display = 'block'
+  })
+
+  dropdownObj.addEventListener('mouseleave', (e) => {
+    if(checkMobileDevice()) return
+    dropdownContent.style.display = 'none'
+  })
+
+  dropdownButton.addEventListener('click', (e) => {
+    if(!checkMobileDevice()) return
+    let dropdownState = dropdownContent.style.display
+    dropdownContent.style.display = (dropdownState == 'block') ? 'none' : 'block'
+  })
+
+})
+
+
+
+
+function toastPopover() {
+  var cartToast = createToast()
+  mainHTML.append(cartToast)
+  cartToast.showPopover()
+
+  setTimeout(() => {
+    cartToast.hidePopover()
+    cartToast.remove()
+  }, "2000");
+}
+
+function createToast() {
+  let newToast = document.createElement('div')
+  let toastText = toastTextCartItemAdded;
+  newToast.classList.add('cart_toast')
+  newToast.setAttribute('popover','auto')
+  newToast.style.animationDuration = 2000
+  newToast.innerHTML = toastText
+  return newToast
+}
+
+// /<div id="cart_toast" popover>Item added to cart</div>
+
+/*
+let cardButtons = document.querySelectorAll('.card_button')
+cardButtons.forEach( (e) => {
+  e.addEventListener('click', ()=> {
+    toastPopover()
+  })
+})
+// */
+
+
+function checkMobileDevice() {
+  let isMobile = false
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) isMobile = true
+  return isMobile
+}

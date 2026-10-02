@@ -1,0 +1,356 @@
+
+
+const webshopAPI = 'https://' + window.location.hostname + '/rest/webshopitems.json';
+
+const rarity_root_folder = 'https://z8games.akamaized.net/cfna/templates/assets/imgs/cfshop/';
+
+const collectionURI = 'https://crossfire.z8games.com/rest/userweapons.json';
+const wCollBaseURL = 'https://z8games.akamaized.net/cfna/web/inventory/weapons/';
+const transparentImgURL = 'https://z8games.akamaized.net/cfna/templates/assets/imgs/transparent_pixel.png';
+
+
+const itemImgPrefix = IMG_ROOT;
+const cartURI = conditionAPI;
+const DEPOSIT_PAGE_URL = depositPage_URL;
+
+const cartTitle = 'Shopping Cart';
+const cartSubTitle = "You can edit the quantity";
+const cartEmptyMsgOne = 'Your Cart is empty';
+const cartEmptyMsgTwo = 'Save now on these great items!';
+const checkout = 'Checkout';
+const clear_title = 'Clear';
+const removeText = 'Clear';
+const regtotal = 'Total Price:';
+const subtotal = 'Total Price:';
+const cartTotalText = 'Total Price';
+const discount_title = 'Savings:';
+const max_reached_message = 'You have reached the limit for this item.';
+const cartUniqueLimit = "Please limit unique items in your cart to xNumber.";
+
+const itemsText = 'item(s)';
+
+const confirmPurchaseText = 'Confirm Purchase';
+const act_balance_text = 'Account Balance';
+const rmdr_balance_text = 'Remaining Balance';
+const cancelText = 'Cancel';
+
+const helpbuttonText = "how it works";
+
+const logged_in_title = "Login!";
+const logged_in_messg = "You are not logged in.";
+const logged_in_action_text = "Login";
+
+const insufficient_funds = 'Insufficient Funds';
+const insufficient_funds_messg = "You have insufficient funds to complete the purchase.";
+const insufficient_funds_action_text = "Buy ZP";
+
+const nochar_msg_title = 'No Character';
+const nochar_msg_messg = "You cannot purchase items without a character";
+const general_delivery_error = "Error in item delivery";
+const nochar_msg_action_text = "Create a character";
+
+const purchaseCompleteTitle = "Congratulations!";
+const purchaseCompleteMessage = "Your purchase has been completed."
+const continueShoppingActionText = "OK";
+
+const couponPurchaseComplete = 'Congratulations, you saved an additional:';
+
+const couldNotRetrieveCart = "Could not retrieve cart information.";
+const couldNotSaveCart = "Could not save item to cart";
+const noCharacterMessage = 'You must have a Crossfire character to purchase the item(s)';
+const itemSaveQuantityError = 'There was an error while updating the item quantity.';
+const itemSaveRemovalError = 'There was an error while removing the item.';
+
+
+const general_error_title = "Warning"
+const errorTitle = 'Error';
+const pleaseLoginContinue = 'Please sign in to continue';
+
+const itemLimitTitle = 'Purchase Limit';
+const itemLimitMessage = 'You have exceeded the maximum number of purchases for this item';
+
+const item_condition_error_message = '  is not in your inventory. Add it to your cart if you want this skin.';
+const vip_item_condition_error_message = '  is a vip item and sadly, you are not a VIP.';
+
+const default_error_message = "An error occurred during the purchase process. Please try again later.";
+const default_limit_message = "You can only select an additional VIPs to your order";
+const default_no_char_message = "You must have a Crossfire character to purchase the item(s)";
+const default_no_item_message = "You have reached the maximum number of pre-orders.";
+const package_error_message = "This account has reached the maximum number of allowed purchases";
+const package_select_error_message = "Please select one of packages";
+const expired_error_message = "The presale has ended ";
+const no_mainitem_selected_message = "Please select one of items";
+const error_char_select_message = "You already owned the character. Please select another one.";
+
+const maxSkins = 21;
+const maxItems = 21;
+const maxCrates = 0;
+const maxVIPLimit = 21;
+
+const maxCart_error_message = 'Each cart/purchase has a limit of ' + maxItems +' items +  ' + maxVIPLimit + '  VIPs (total of ' + (maxSkins + maxItems) + ' items in your cart).';
+
+const obtainedText = 'Claimed';
+
+const flatDiscount = false;
+const flatDiscountPercent = 0;
+
+//const SpendMoreForSavingsText1 = 'Add items valued'; // <span class="tiers-target">';
+//const SpendMoreForSavingsText2 = ' ZP</span> to your cart to receive a greater discount!';
+const SpendMoreForSavingsText1 = 'Add items valued '; // <span class="tiers-target">';
+const SpendMoreForSavingsText2 = ' to your cart to receive a greater discount!';
+const SpendMoreForSavingsText3 = 'Congratulations, all items in your cart are 50% off!<br>&nbsp;';
+
+const tierText = 'Tier';
+
+const redeemableDiv = '.REDEEMABLE';
+const attendanceTitle = 'Attendance Reward';
+const redeemText = 'redeem';
+const redeemPara1 = 'You must complete ';
+const redeemPara2 = ' day(s) to ' + redeemText + ' this prize';
+const redeemNotice = 'Day(s) Completed: ';
+const general_delivery_success = "Your item has been delivered";
+
+var balanceElem = $('#balance');
+var costElem = $('#cost');
+var remainingElem = $('#remaining');
+var cartTotalElem = $('#cartTotal');
+
+
+
+$(document).ready(function(){
+
+
+	updateTranslations();
+
+	init();
+
+
+});
+
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+function mysteryDiscount(subtotal){
+	/*
+	 N/A 	 N/A
+	  100 	  500
+	  250 	  1,250
+	  500 	  2,500
+	  1,000 	  5,000
+	  1,500 	  7,500
+
+	*/
+	var min, max;
+	var savings = 0;
+
+	if(subtotal >= 10000) {
+		min = 100;
+		max = 500;
+	}
+
+	if(subtotal >= 25000) {
+		min = 250;
+		max = 1250;		}
+	if(subtotal >= 50000) {
+		min = 500;
+		max = 2500;
+	}
+	if(subtotal >= 100000) {
+		min = 1000;
+		max = 5000;		}
+
+	if(subtotal >= 200000) {
+		min = 1500;
+		max = 7500;
+	}
+
+	savings = (min) ? getRandomInt(min, max) : 0;
+
+	return savings;
+}
+
+function updateTranslations(){
+
+	$('#checkoutTitle').text(checkout);
+	$('#checkoutBalance').text(act_balance_text);
+	$('#checkoutCost').text(regtotal);
+	$('#checkoutRemaining').text(rmdr_balance_text);
+	$('#btn-confirm').text(checkout);
+	$('#checkoutCancel').text(cancelText);
+	$('#btn-checkout').text(checkout);
+	$('#btn-close').text(continueShoppingActionText);
+	$('#cartTitleName').text(cartTitle);
+	$('#totalCartText').text(cartTotalText);
+	$('.cart-item-ui-remove').text(removeText);
+}
+
+function showModalMessage(message, header = general_error_title){
+
+	if(header){
+		$('#modalMessageTitle').html(header);
+	}
+	if(message){
+		$('#message').html('<p>' + message + '</p>');
+	}
+
+
+	var strings = [
+					  '<h1 id="modalMessageTitle">'
+					,   header
+					, '</h1>'
+					,  '<div id="message">'
+					,      message
+					,  '</div>'
+					,  '<div id="controls"><button id="btn-close">' + continueShoppingActionText + '</button></div>'
+
+				   ];
+
+	var string = strings.join('');
+
+	$('.modal__checkout-message').html(string);
+
+	activateModal('.modal__checkout-message')
+
+}
+
+let discountPriceCount = 0;
+function addToConsole(string)
+{
+	if(debug){
+		try{
+
+			if(typeof string === 'string' && string.includes('new discount PRICE')){
+
+				discountPriceCount++;
+			}
+
+			console.log(string);
+		}catch(e){
+			console.log(e)
+		}
+	}
+}
+
+function addCommas(nStr)
+{
+
+	if(parseInt(nStr) && nStr === 0 || isNaN(nStr)) { return 0;}
+
+	nStr += '';
+	let x = nStr.split('.');
+	let x1 = x[0];
+	let x2 = x.length > 1 ? '.' + x[1] : '';
+	let rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + commaVal + '$2');
+	}
+	return x1 + x2;
+}
+
+function init(){
+
+    if(smartOptions.show_cart){
+		$('.cart_table').smartCart(smartOptions);
+    }else{
+        $('#menuNavWallet').smartCart(smartOptions);
+    }
+
+	let initiated = false;
+
+	$(document).ajaxStop(function() {
+		if(!initiated){
+			initiated = true;
+
+			try{initializeClock();}catch(e){console.log(e);}
+			try{startCarousels();}catch(e){console.log(e);}
+			try{startModals();}catch(e){console.log(e);}
+			try{startModalsVideo();}catch(e){console.log(e);}
+
+			//Independent Order
+			try{initializeAccordions();}catch(e){console.log(e);}
+			try{initializeScrollFX();}catch(e){console.log(e);}
+			try{initializeTabs();}catch(e){console.log(e);}
+			try{initializeToolTips();}catch(e){console.log(e);}
+
+			//console.log('Counted: ' + discountPriceCount + ' discounts performed');
+		}
+	});
+}
+
+const DiscountTiers = [
+	{
+		"REWARD_IMG_URL": null,
+		"REWARD_NAME": null,
+		"LOWER_LEVEL": 0,
+		"UPPER_LEVEL": 9999,
+		"DISCOUNT": 25,
+	},
+	{
+		"REWARD_IMG_URL": "https://z8games.akamaized.net/cfna/event/2025blackfriday_b6g9h8x5c4v7/images/rewards/30_W9850.png",
+		"REWARD_NAME": "AK12-Surge Beast",
+		"REWARD_ITEMID": "2019629201",
+		"LOWER_LEVEL": 10000,
+		"UPPER_LEVEL": 24999,
+		"DISCOUNT": 30,
+	},
+	{
+		"REWARD_IMG_URL": "https://z8games.akamaized.net/cfna/event/2025blackfriday_b6g9h8x5c4v7/images/rewards/35_C4244.png",
+		"REWARD_NAME": "Shovel-Surge Demon",
+		"REWARD_ITEMID": "2019575601",
+		"LOWER_LEVEL": 25000,
+		"UPPER_LEVEL": 49999,
+		"DISCOUNT": 35,
+	},
+	{
+		"REWARD_IMG_URL": "https://z8games.akamaized.net/cfna/event/2025blackfriday_b6g9h8x5c4v7/images/rewards/40_A9816.png",
+		"REWARD_NAME": "Ninette",
+		"REWARD_ITEMID": "1009018401",
+		"LOWER_LEVEL": 50000,
+		"UPPER_LEVEL": 99999,
+		"DISCOUNT": 40,
+	},
+	{
+		"REWARD_IMG_URL": "https://z8games.akamaized.net/cfna/event/2025blackfriday_b6g9h8x5c4v7/images/rewards/45_W9849.png",
+		"REWARD_NAME": "Barrett-Surge Shark",
+		"REWARD_ITEMID": "2019629301",
+		"LOWER_LEVEL": 100000,
+		"UPPER_LEVEL": 199999,
+		"DISCOUNT": 45,
+	},
+	{
+		"REWARD_IMG_URL": "https://z8games.akamaized.net/cfna/event/2025blackfriday_b6g9h8x5c4v7/images/rewards/50_W9848.png",
+		"REWARD_NAME": "M4A1-S-Iron Surge",
+		"REWARD_ITEMID": "2019629401",
+		"LOWER_LEVEL": 200000,
+		"UPPER_LEVEL": 90000000,
+		"DISCOUNT": 50,
+	}
+];
+
+function updateBonuses(items){
+
+	// reward TIER_IDs are 2-6
+
+	var showReward = null;
+
+	addToConsole(items);
+	if(!(items)){ return;}
+	addToConsole('showing bonuses received');
+
+	$.each(items, function(i, reward) {
+
+		var progressElem = ".progress" + (parseInt(reward.TIER_ID, 10) - 1);
+		//$( progressElem ).attr('obtained', '');
+		
+		$( progressElem + ' > .status').html('<span>' + obtainedText + '</span>');
+		$( progressElem + ' > .status').addClass('icon').addClass('cfshop-icon-checked');
+
+		showReward = progressElem;
+		addToConsole('showing reward for ', showReward);
+
+	});
+}
